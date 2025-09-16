@@ -3,55 +3,109 @@ document.addEventListener("DOMContentLoaded", () => {
     firebase.initializeApp(firebaseConfig);
   }
 
-  // --- INICIALIZAÇÃO DOS SERVIÇOS FIREBASE ---
   const db = firebase.firestore();
   const auth = firebase.auth();
 
-  // --- ELEMENTOS DO DOM ---
-  // Autenticação
-  const loginBtn = document.getElementById("login-btn");
-  const logoutBtn = document.getElementById("logout-btn");
+  // Elementos de Autenticação
   const authContainer = document.getElementById("auth-container");
+  const loginView = document.getElementById("login-view");
+  const registerView = document.getElementById("register-view");
+  const showRegisterLink = document.getElementById("show-register");
+  const showLoginLink = document.getElementById("show-login");
+
+  const loginEmailInput = document.getElementById("login-email");
+  const loginPasswordInput = document.getElementById("login-password");
+  const loginEmailBtn = document.getElementById("login-email-btn");
+
+  const registerEmailInput = document.getElementById("register-email");
+  const registerPasswordInput = document.getElementById("register-password");
+  const registerBtn = document.getElementById("register-btn");
+
+  const googleLoginBtn = document.getElementById("login-google-btn");
+  const logoutBtn = document.getElementById("logout-btn");
   const userInfo = document.getElementById("user-info");
   const userEmailSpan = document.getElementById("user-email");
   const appContent = document.getElementById("app-content");
 
-  // Formulário e Lista de Gastos
+  // Elementos da Aplicação
   const expenseForm = document.getElementById("expense-form");
   const descriptionInput = document.getElementById("description");
   const categoryInput = document.getElementById("category");
   const amountInput = document.getElementById("amount");
   const expenseList = document.getElementById("expense-list");
 
-  // Métricas e Gráfico
+  // Elementos de Métricas
   const totalAmountSpan = document.getElementById("total-amount");
   const dailyTotalSpan = document.getElementById("daily-total");
   const monthlyTotalSpan = document.getElementById("monthly-total");
   const chartCanvas = document.getElementById("expense-chart").getContext("2d");
   let expenseChart;
 
-  // Variável para guardar o "ouvinte" do Firestore e poder desligá-lo no logout
   let unsubscribeFromExpenses;
 
   // --- LÓGICA DE AUTENTICAÇÃO ---
 
-  // Botão de Login
-  loginBtn.addEventListener("click", () => {
+  // Alternar entre telas de login e registro
+  showRegisterLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    loginView.style.display = "none";
+    registerView.style.display = "block";
+  });
+
+  showLoginLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    registerView.style.display = "none";
+    loginView.style.display = "block";
+  });
+
+  // Login com Google
+  googleLoginBtn.addEventListener("click", () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     auth.signInWithPopup(provider).catch((error) => {
-      console.error("Erro no login: ", error);
+      console.error("Erro no login com Google: ", error);
+      alert(`Erro: ${error.message}`);
     });
   });
 
-  // Botão de Logout
+  // Login com E-mail e Senha
+  loginEmailBtn.addEventListener("click", () => {
+    const email = loginEmailInput.value;
+    const password = loginPasswordInput.value;
+    if (!email || !password) {
+      alert("Por favor, preencha e-mail e senha.");
+      return;
+    }
+    auth.signInWithEmailAndPassword(email, password).catch((error) => {
+      console.error("Erro no login com e-mail: ", error);
+      alert(`Erro ao fazer login: ${error.message}`);
+    });
+  });
+
+  // Registro com E-mail e Senha
+  registerBtn.addEventListener("click", () => {
+    const email = registerEmailInput.value;
+    const password = registerPasswordInput.value;
+    if (!email || !password) {
+      alert("Por favor, preencha e-mail e senha para se registrar.");
+      return;
+    }
+    auth
+      .createUserWithEmailAndPassword(email, password)
+      .catch((error) => {
+        console.error("Erro no registro: ", error);
+        alert(`Erro ao registrar: ${error.message}`);
+      });
+  });
+
+  // Logout
   logoutBtn.addEventListener("click", () => {
     auth.signOut();
   });
 
-  // Gerenciador de Estado de Autenticação (a parte principal)
+  // Observador de estado de autenticação
   auth.onAuthStateChanged((user) => {
     if (user) {
-      // Usuário está LOGADO
+      // Usuário está logado
       authContainer.style.display = "none";
       userInfo.style.display = "block";
       appContent.style.display = "block";
@@ -59,19 +113,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
       loadAndListenForExpenses(user.uid);
     } else {
-      // Usuário está DESLOGADO
+      // Usuário está deslogado
       authContainer.style.display = "block";
       userInfo.style.display = "none";
       appContent.style.display = "none";
-      expenseList.innerHTML = "";
-      
+      expenseList.innerHTML = ""; // Limpa a lista de gastos
+
+      // Cancela a inscrição de ouvinte de gastos
       if (unsubscribeFromExpenses) {
         unsubscribeFromExpenses();
       }
     }
   });
 
-  // --- FUNÇÕES DO APLICATIVO ---
+  // --- LÓGICA DA APLICAÇÃO DE GASTOS ---
 
   function loadAndListenForExpenses(userId) {
     const query = db
@@ -96,7 +151,11 @@ document.addEventListener("DOMContentLoaded", () => {
     let totalMensal = 0;
     const categoryTotals = {};
     const hoje = new Date();
-    const inicioDoDia = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+    const inicioDoDia = new Date(
+      hoje.getFullYear(),
+      hoje.getMonth(),
+      hoje.getDate()
+    );
     const inicioDoMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
 
     docs.forEach((doc) => {
@@ -147,7 +206,14 @@ document.addEventListener("DOMContentLoaded", () => {
           {
             label: "Gastos por Categoria",
             data: Object.values(categoryData),
-            backgroundColor: ["#FF6384","#36A2EB","#FFCE56","#4BC0C0","#9966FF","#FF9F40"],
+            backgroundColor: [
+              "#FF6384",
+              "#36A2EB",
+              "#FFCE56",
+              "#4BC0C0",
+              "#9966FF",
+              "#FF9F40",
+            ],
           },
         ],
       },
@@ -155,7 +221,10 @@ document.addEventListener("DOMContentLoaded", () => {
         responsive: true,
         plugins: {
           legend: { position: "top" },
-          title: { display: true, text: "Distribuição de Gastos por Categoria" },
+          title: {
+            display: true,
+            text: "Distribuição de Gastos por Categoria",
+          },
         },
       },
     });
@@ -189,7 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- EVENT LISTENERS PARA AÇÕES DO USUÁRIO ---
+  // --- EVENT LISTENERS DA APLICAÇÃO ---
 
   expenseForm.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -202,7 +271,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const category = categoryInput.value;
     const amount = parseFloat(amountInput.value);
 
-    if (description.trim() !== "" && category !== "" && !isNaN(amount) && amount > 0) {
+    if (
+      description.trim() !== "" &&
+      category !== "" &&
+      !isNaN(amount) &&
+      amount > 0
+    ) {
       addExpenseToDB(description, category, amount, user.uid);
       expenseForm.reset();
       descriptionInput.focus();
