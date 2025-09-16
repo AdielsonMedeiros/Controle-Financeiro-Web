@@ -122,3 +122,25 @@ select {
     font-size: 16px;
     background-color: white; /* Garante fundo branco em todos os navegadores */
 }
+
+.metrics {
+    text-align: right;
+    margin-top: 20px;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.metrics p {
+    margin-bottom: 5px;
+}
+
+.metrics span {
+    font-weight: bold;
+    color: #333;
+}
+
+.chart-container {
+    width: 100%;
+    max-width: 400px; /* Define uma largura máxima */
+    margin: 20px auto; /* Centraliza o gráfico */
+}

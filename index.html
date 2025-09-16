@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Gastos</title>
-    <link rel="stylesheet" href="styles.css"> 
+    <link rel="stylesheet" href="/financa/styles.css"> 
 </head>
 <body>
 
@@ -39,20 +39,34 @@
 
         <hr>
 
+        <div class="chart-container">
+            <canvas id="expense-chart"></canvas>
+        </div>
+
+        <hr>
+
         <h2>Histórico de Gastos</h2>
         <ul id="expense-list">
-            </ul>
+        </ul>
+        
+        <hr>
+
+        <div class="metrics">
+            <p>Gasto Hoje: R$ <span id="daily-total">0.00</span></p>
+            <p>Gasto no Mês: R$ <span id="monthly-total">0.00</span></p>
+        </div>
 
         <div class="total">
-            <h3>Total: R$ <span id="total-amount">0.00</span></h3>
+            <h3>Total Geral: R$ <span id="total-amount">0.00</span></h3>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script src="/financa/config.js"></script> 
-
     <script src="/financa/script.js"></script> 
 </body>
 </html>
