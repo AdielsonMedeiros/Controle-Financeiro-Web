@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Gastos</title>
-    <link rel="stylesheet" href="/financa/styles.css">
+    <link rel="stylesheet" href="styles.css"> 
 </head>
 <body>
 
@@ -16,6 +16,20 @@
                 <label for="description">Descrição do Gasto</label>
                 <input type="text" id="description" placeholder="Ex: Almoço, transporte..." required>
             </div>
+            
+            <div class="form-group">
+                <label for="category">Categoria</label>
+                <select id="category" required>
+                    <option value="" disabled selected>Selecione uma categoria</option>
+                    <option value="Alimentação">Alimentação</option>
+                    <option value="Transporte">Transporte</option>
+                    <option value="Lazer">Lazer</option>
+                    <option value="Moradia">Moradia</option>
+                    <option value="Saúde">Saúde</option>
+                    <option value="Outros">Outros</option>
+                </select>
+            </div>
+
             <div class="form-group">
                 <label for="amount">Valor (R$)</label>
                 <input type="number" id="amount" step="0.01" placeholder="Ex: 25,50" required>
@@ -34,6 +48,11 @@
         </div>
     </div>
 
-    <script src="/financa/script.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script src="/financa/config.js"></script> 
+
+    <script src="/financa/script.js"></script> 
 </body>
 </html>

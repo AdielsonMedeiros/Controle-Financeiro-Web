@@ -111,3 +111,14 @@ button:hover {
     font-weight: bold;
     color: #28a745;
 }
+
+/* Adicione este código ao final do seu arquivo styles.css */
+
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: white; /* Garante fundo branco em todos os navegadores */
+}
