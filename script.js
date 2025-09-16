@@ -1,44 +1,37 @@
-// Arquivo: script.js (versão com métricas e gráfico)
-
 document.addEventListener("DOMContentLoaded", () => {
-  // Configuração do Firebase (sem alterações)
+  
   if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
   }
   
   const db = firebase.firestore();
   
-  // --- Seletores do HTML ---
   const expenseForm = document.getElementById("expense-form");
   const descriptionInput = document.getElementById("description");
   const categoryInput = document.getElementById("category");
   const amountInput = document.getElementById("amount");
   const expenseList = document.getElementById("expense-list");
   
-  // Seletores de métricas
   const totalAmountSpan = document.getElementById("total-amount");
   const dailyTotalSpan = document.getElementById("daily-total");
   const monthlyTotalSpan = document.getElementById("monthly-total");
 
-  // --- Lógica do Gráfico ---
   const chartCanvas = document.getElementById("expense-chart").getContext('2d');
-  let expenseChart; // Variável para armazenar a instância do gráfico
+  let expenseChart; 
 
-  // Função para criar ou atualizar o gráfico de pizza
   function renderOrUpdateChart(categoryData) {
-    // Destrói o gráfico anterior se ele existir (para evitar sobreposição)
     if (expenseChart) {
       expenseChart.destroy();
     }
 
     expenseChart = new Chart(chartCanvas, {
-      type: 'pie', // Tipo do gráfico
+      type: 'pie', 
       data: {
-        labels: Object.keys(categoryData), // Nomes das categorias (Alimentação, Transporte, etc.)
+        labels: Object.keys(categoryData), 
         datasets: [{
           label: 'Gastos por Categoria',
-          data: Object.values(categoryData), // Valores de cada categoria
-          backgroundColor: [ // Cores para cada fatia
+          data: Object.values(categoryData), 
+          backgroundColor: [ 
             '#FF6384',
             '#36A2EB',
             '#FFCE56',
@@ -63,17 +56,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Função para renderizar gastos, métricas E O GRÁFICO
   function renderExpensesAndMetrics(docs) {
     expenseList.innerHTML = "";
     
-    // Variáveis para cálculos
     let totalGeral = 0;
     let totalDiario = 0;
     let totalMensal = 0;
-    const categoryTotals = {}; // Objeto para agrupar totais por categoria
+    const categoryTotals = {}; 
 
-    // Datas de referência
     const hoje = new Date();
     const inicioDoDia = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
     const inicioDoMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
@@ -83,25 +73,25 @@ document.addEventListener("DOMContentLoaded", () => {
         const expenseAmount = parseFloat(expense.amount);
         const expenseCategory = expense.category;
 
-        // 1. Renderiza o item na lista
         const listItem = document.createElement("li");
+        // --- ALTERAÇÃO AQUI: Adicionado o botão de exclusão com o ID do documento ---
         listItem.innerHTML = `
-            <span>${expense.description} <em>(${expenseCategory})</em></span>
-            <span>R$ ${expenseAmount.toFixed(2)}</span>
+            <div class="expense-info">
+              <span>${expense.description} <em>(${expenseCategory})</em></span>
+              <span>R$ ${expenseAmount.toFixed(2)}</span>
+            </div>
+            <button class="delete-btn" data-id="${doc.id}">Excluir</button>
         `;
         expenseList.appendChild(listItem);
 
-        // 2. Soma para o total geral
         totalGeral += expenseAmount;
 
-        // 3. Agrupa os valores por categoria para o gráfico
         if (categoryTotals[expenseCategory]) {
           categoryTotals[expenseCategory] += expenseAmount;
         } else {
           categoryTotals[expenseCategory] = expenseAmount;
         }
 
-        // 4. Calcula métricas diárias e mensais
         if (expense.createdAt) {
             const expenseDate = expense.createdAt.toDate();
             if (expenseDate >= inicioDoDia) {
@@ -113,16 +103,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // 5. Atualiza os valores no HTML
     totalAmountSpan.textContent = totalGeral.toFixed(2);
     dailyTotalSpan.textContent = totalDiario.toFixed(2);
     monthlyTotalSpan.textContent = totalMensal.toFixed(2);
 
-    // 6. Renderiza ou atualiza o gráfico
     renderOrUpdateChart(categoryTotals);
   }
 
-  // Função para adicionar gasto no Firestore (sem alterações)
   async function addExpenseToDB(description, category, amount) {
     try {
       await db.collection("gastos").add({
@@ -138,7 +125,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Event listener para o formulário (sem alterações)
+  // --- NOVA FUNÇÃO: Para excluir um gasto do banco de dados ---
+  async function deleteExpenseFromDB(id) {
+    if (confirm("Tem certeza que deseja excluir este gasto?")) {
+        try {
+            await db.collection("gastos").doc(id).delete();
+            console.log("Gasto excluído com sucesso!");
+        } catch (error) {
+            console.error("Erro ao excluir gasto: ", error);
+            alert("Não foi possível excluir o gasto.");
+        }
+    }
+  }
+
   expenseForm.addEventListener("submit", (event) => {
     event.preventDefault();
     const description = descriptionInput.value;
@@ -154,7 +153,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Listener do Firestore (sem alterações)
+  // --- NOVO EVENT LISTENER: Para capturar cliques nos botões de exclusão ---
+  expenseList.addEventListener("click", (event) => {
+    if (event.target.classList.contains("delete-btn")) {
+        const id = event.target.getAttribute("data-id");
+        deleteExpenseFromDB(id);
+    }
+  });
+
   db.collection("gastos")
     .orderBy("createdAt", "desc")
     .onSnapshot((snapshot) => {
