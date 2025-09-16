@@ -10,72 +10,92 @@
     <div class="container">
       <h1>Meu Controle Financeiro</h1>
 
-      <form id="expense-form">
-        <div class="form-group">
-          <label for="description">Descrição do Gasto</label>
-          <input
-            type="text"
-            id="description"
-            placeholder="Ex: Almoço, transporte..."
-            required
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="category">Categoria</label>
-          <select id="category" required>
-            <option value="" disabled selected>Selecione uma categoria</option>
-            <option value="Alimentação">Alimentação</option>
-            <option value="Transporte">Transporte</option>
-            <option value="Lazer">Lazer</option>
-            <option value="Moradia">Moradia</option>
-            <option value="Saúde">Saúde</option>
-            <option value="Outros">Outros</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="amount">Valor (R$)</label>
-          <input
-            type="number"
-            id="amount"
-            step="0.01"
-            placeholder="Ex: 25,50"
-            required
-          />
-        </div>
-        <button type="submit">Adicionar Gasto</button>
-      </form>
-
-      <hr />
-
-      <div class="chart-container">
-        <canvas id="expense-chart"></canvas>
+      <div id="auth-container">
+        <p style="text-align: center; margin-bottom: 15px">
+          Por favor, faça o login para continuar.
+        </p>
+        <button id="login-btn" class="auth-btn">Login com Google</button>
       </div>
 
-      <hr />
-
-      <h2>Histórico de Gastos</h2>
-      <ul id="expense-list"></ul>
-
-      <hr />
-
-      <div class="metrics">
-        <p>Gasto Hoje: R$ <span id="daily-total">0.00</span></p>
-        <p>Gasto no Mês: R$ <span id="monthly-total">0.00</span></p>
+      <div
+        id="user-info"
+        style="display: none; text-align: center; margin-bottom: 20px"
+      >
+        <p>Olá, <span id="user-email"></span>!</p>
+        <button id="logout-btn" class="auth-btn-logout">Sair</button>
       </div>
 
-      <div class="total">
-        <h3>Total Geral: R$ <span id="total-amount">0.00</span></h3>
+      <div id="app-content" style="display: none">
+        <form id="expense-form">
+          <div class="form-group">
+            <label for="description">Descrição do Gasto</label>
+            <input
+              type="text"
+              id="description"
+              placeholder="Ex: Almoço, transporte..."
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="category">Categoria</label>
+            <select id="category" required>
+              <option value="" disabled selected>
+                Selecione uma categoria
+              </option>
+              <option value="Alimentação">Alimentação</option>
+              <option value="Transporte">Transporte</option>
+              <option value="Lazer">Lazer</option>
+              <option value="Moradia">Moradia</option>
+              <option value="Saúde">Saúde</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="amount">Valor (R$)</label>
+            <input
+              type="number"
+              id="amount"
+              step="0.01"
+              placeholder="Ex: 25,50"
+              required
+            />
+          </div>
+          <button type="submit">Adicionar Gasto</button>
+        </form>
+
+        <hr />
+
+        <div class="chart-container">
+          <canvas id="expense-chart"></canvas>
+        </div>
+
+        <hr />
+
+        <h2>Histórico de Gastos</h2>
+        <ul id="expense-list"></ul>
+
+        <hr />
+
+        <div class="metrics">
+          <p>Gasto Hoje: R$ <span id="daily-total">0.00</span></p>
+          <p>Gasto no Mês: R$ <span id="monthly-total">0.00</span></p>
+        </div>
+
+        <div class="total">
+          <h3>Total Geral: R$ <span id="total-amount">0.00</span></h3>
+        </div>
       </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script src="config.js"></script>
-    <script src="script.js"></script>
+
+    <script defer src="script.js"></script>
   </body>
 </html>

@@ -75,6 +75,27 @@ button:hover {
     background-color: #0056b3;
 }
 
+/* --- NOVOS ESTILOS PARA AUTENTICAÇÃO --- */
+.auth-btn {
+    background-color: #4285F4; /* Cor do Google */
+}
+.auth-btn:hover {
+    background-color: #357ae8;
+}
+
+.auth-btn-logout {
+    width: auto;
+    padding: 8px 15px;
+    background-color: #6c757d;
+    font-size: 14px;
+    margin-top: 5px;
+}
+.auth-btn-logout:hover {
+    background-color: #5a6268;
+}
+/* --- FIM DOS NOVOS ESTILOS --- */
+
+
 #expense-list {
     list-style-type: none;
     padding: 0;
@@ -91,7 +112,6 @@ button:hover {
     font-size: 16px;
 }
 
-/* --- ALTERAÇÃO AQUI: Organiza as informações do gasto --- */
 #expense-list li .expense-info {
     display: flex;
     flex-direction: column;
@@ -101,10 +121,9 @@ button:hover {
 #expense-list li span:last-child {
     font-weight: bold;
     color: #c92a2a; 
-    margin-top: 5px; /* Espaçamento entre descrição e valor */
+    margin-top: 5px;
 }
 
-/* --- NOVO ESTILO: Para o botão de exclusão --- */
 .delete-btn {
     width: auto;
     padding: 8px 12px;
@@ -116,7 +135,6 @@ button:hover {
 .delete-btn:hover {
     background-color: #c82333;
 }
-
 
 .total {
     text-align: right;
@@ -139,7 +157,7 @@ select {
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 16px;
-    background-color: white; /* Garante fundo branco em todos os navegadores */
+    background-color: white;
 }
 
 .metrics {
@@ -160,6 +178,6 @@ select {
 
 .chart-container {
     width: 100%;
-    max-width: 400px; /* Define uma largura máxima */
-    margin: 20px auto; /* Centraliza o gráfico */
+    max-width: 400px;
+    margin: 20px auto;
 }

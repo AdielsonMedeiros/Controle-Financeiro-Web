@@ -1,11 +1,9 @@
-// Arquivo: config.js
-
 const firebaseConfig = {
-  apiKey: "AIzaSyC54qbzx3YQJ2gam0LNC0KvRD4CIxzFLR8",
-  authDomain: "gastos-b24a4.firebaseapp.com",
-  projectId: "gastos-b24a4",
-  storageBucket: "gastos-b24a4.appspot.com",
-  messagingSenderId: "456706783032",
-  appId: "1:456706783032:web:365ce9cb1f61c3c9dd73cd",
-  measurementId: "G-H391E5P236"
+  apiKey: "AIzaSyCtnR4Mzt1Z_8H9mKg8SuSn090DluB2cOs",
+  authDomain: "meu-controle-financeiro-f2cdb.firebaseapp.com",
+  projectId: "meu-controle-financeiro-f2cdb",
+  storageBucket: "meu-controle-financeiro-f2cdb.appspot.com",
+  messagingSenderId: "469665350572",
+  appId: "1:469665350572:web:1bf59b3a31cc2589ba7009",
+  measurementId: "G-9STKVTXJFZ"
 };
