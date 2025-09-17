@@ -28,7 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const logoutBtn = document.getElementById("logout-btn");
   const userInfo = document.getElementById("user-info");
   const userEmailSpan = document.getElementById("user-email");
-
   const userAvatar = document.getElementById("user-avatar");
   const appContent = document.getElementById("app-content");
 
@@ -46,6 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let unsubscribeFromExpenses;
 
+ 
+
   showRegisterLink.addEventListener("click", (e) => {
     e.preventDefault();
     loginView.style.display = "none";
@@ -58,32 +59,21 @@ document.addEventListener("DOMContentLoaded", () => {
     loginView.style.display = "block";
   });
 
-  // --- FUNÇÃO handleProviderLogin TOTALMENTE CORRIGIDA ---
   function handleProviderLogin(provider) {
     auth.signInWithPopup(provider).catch((error) => {
       if (error.code === "auth/account-exists-with-different-credential") {
         pendingCredential = error.credential;
         auth.fetchSignInMethodsForEmail(error.email).then((methods) => {
-          
-          // Lógica de tradução do nome do provedor
-          let providerName = "seu método original"; // Mensagem padrão
+          let providerName = "seu método original";
           if (methods && methods.length > 0) {
             const providerId = methods[0];
-            if (providerId === 'password') {
-                providerName = 'E-mail e Senha';
-            } else if (providerId === 'google.com') {
-                providerName = 'Google';
-            } else if (providerId === 'github.com') {
-                providerName = 'GitHub';
-            } else {
-                providerName = providerId;
-            }
+            if (providerId === 'password') providerName = 'E-mail e Senha';
+            else if (providerId === 'google.com') providerName = 'Google';
+            else if (providerId === 'github.com') providerName = 'GitHub';
+            else providerName = providerId;
           } else {
-            // Se o array vier vazio, é quase certeza que a conta foi criada
-            // com e-mail e senha, mas nunca usada com um provedor social.
             providerName = 'E-mail e Senha';
           }
-
           alert(
             `Você já tem uma conta com este e-mail usando o método: ${providerName}. ` +
             `Por favor, faça login com este método para vincular sua nova conta.`
@@ -105,15 +95,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const provider = new firebase.auth.GithubAuthProvider();
     handleProviderLogin(provider);
   });
-  // --- FIM DAS CORREÇÕES ---
 
   loginEmailBtn.addEventListener("click", () => {
     const email = loginEmailInput.value;
     const password = loginPasswordInput.value;
-    if (!email || !password) {
-      alert("Por favor, preencha e-mail e senha.");
-      return;
-    }
+    if (!email || !password) return alert("Por favor, preencha e-mail e senha.");
     auth.signInWithEmailAndPassword(email, password).catch((error) => {
       console.error("Erro no login com e-mail: ", error);
       alert(`Erro ao fazer login: ${error.message}`);
@@ -123,174 +109,153 @@ document.addEventListener("DOMContentLoaded", () => {
   registerBtn.addEventListener("click", () => {
     const email = registerEmailInput.value;
     const password = registerPasswordInput.value;
-    if (!email || !password) {
-      alert("Por favor, preencha e-mail e senha para se registrar.");
-      return;
-    }
-    auth
-      .createUserWithEmailAndPassword(email, password)
-      .catch((error) => {
-        console.error("Erro no registro: ", error);
-        alert(`Erro ao registrar: ${error.message}`);
-      });
+    if (!email || !password) return alert("Por favor, preencha e-mail e senha para se registrar.");
+    auth.createUserWithEmailAndPassword(email, password).catch((error) => {
+      console.error("Erro no registro: ", error);
+      alert(`Erro ao registrar: ${error.message}`);
+    });
   });
 
-  logoutBtn.addEventListener("click", () => {
-    auth.signOut();
-  });
+  logoutBtn.addEventListener("click", () => auth.signOut());
 
   auth.onAuthStateChanged((user) => {
     if (user) {
       if (pendingCredential) {
-        user.linkWithCredential(pendingCredential)
-          .then(() => {
-            console.log("Conta vinculada com sucesso!");
-            alert("Sua conta foi vinculada com sucesso!");
-            pendingCredential = null;
-          })
-          .catch((error) => {
-            console.error("Erro ao vincular conta:", error);
-            alert(`Não foi possível vincular a conta: ${error.message}`);
-            pendingCredential = null;
-          });
+        user.linkWithCredential(pendingCredential).then(() => {
+          alert("Sua conta foi vinculada com sucesso!");
+          pendingCredential = null;
+        }).catch((error) => {
+          alert(`Não foi possível vincular a conta: ${error.message}`);
+          pendingCredential = null;
+        });
       }
-      
       authContainer.style.display = "none";
       userInfo.style.display = "flex";
       appContent.style.display = "block";
       userEmailSpan.textContent = user.email;
-
-      const avatarUrl =
-        user.photoURL ||
-        `https://ui-avatars.com/api/?name=${user.email}&background=random`;
+      const avatarUrl = user.photoURL || `https://ui-avatars.com/api/?name=${user.email}&background=random`;
       userAvatar.src = avatarUrl;
-
       loadAndListenForExpenses(user.uid);
     } else {
       authContainer.style.display = "block";
       userInfo.style.display = "none";
       appContent.style.display = "none";
       expenseList.innerHTML = "";
-
-      if (unsubscribeFromExpenses) {
-        unsubscribeFromExpenses();
-      }
+      if (unsubscribeFromExpenses) unsubscribeFromExpenses();
     }
   });
 
-  function loadAndListenForExpenses(userId) {
-    const query = db
-      .collection("users")
-      .doc(userId)
-      .collection("gastos")
-      .orderBy("createdAt", "desc");
+  
 
+  function loadAndListenForExpenses(userId) {
+    const query = db.collection("users").doc(userId).collection("gastos").orderBy("createdAt", "desc");
     unsubscribeFromExpenses = query.onSnapshot(
-      (snapshot) => {
-        renderExpensesAndMetrics(snapshot.docs);
-      },
-      (error) => {
-        console.error("Erro ao carregar gastos: ", error);
-      }
+      (snapshot) => renderExpensesAndMetrics(snapshot.docs),
+      (error) => console.error("Erro ao carregar gastos: ", error)
     );
   }
 
   function renderExpensesAndMetrics(docs) {
     expenseList.innerHTML = "";
-    let totalGeral = 0;
-    let totalDiario = 0;
-    let totalMensal = 0;
+    let totalGeral = 0, totalDiario = 0, totalMensal = 0;
     const categoryTotals = {};
-    const hoje = new Date();
-    const inicioDoDia = new Date(
-      hoje.getFullYear(),
-      hoje.getMonth(),
-      hoje.getDate()
-    );
-    const inicioDoMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+    const hoje = new Date(), inicioDoDia = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()), inicioDoMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
 
     docs.forEach((doc) => {
-      const expense = doc.data();
-      const expenseAmount = parseFloat(expense.amount);
-      const expenseCategory = expense.category;
+      const expense = doc.data(), expenseAmount = parseFloat(expense.amount), expenseCategory = expense.category;
       const listItem = document.createElement("li");
-      listItem.innerHTML = `
-        <div class="expense-info">
-          <span>${expense.description} <em>(${expenseCategory})</em></span>
-          <span>R$ ${expenseAmount.toFixed(2)}</span>
-        </div>
-        <button class="delete-btn" data-id="${doc.id}">Excluir</button>
-      `;
+      listItem.innerHTML = `<div class="expense-info"><span>${expense.description} <em>(${expenseCategory})</em></span><span>R$ ${expenseAmount.toFixed(2)}</span></div><button class="delete-btn" data-id="${doc.id}">Excluir</button>`;
       expenseList.appendChild(listItem);
       totalGeral += expenseAmount;
-      if (categoryTotals[expenseCategory]) {
-        categoryTotals[expenseCategory] += expenseAmount;
-      } else {
-        categoryTotals[expenseCategory] = expenseAmount;
-      }
+      categoryTotals[expenseCategory] = (categoryTotals[expenseCategory] || 0) + expenseAmount;
       if (expense.createdAt) {
         const expenseDate = expense.createdAt.toDate();
-        if (expenseDate >= inicioDoDia) {
-          totalDiario += expenseAmount;
-        }
-        if (expenseDate >= inicioDoMes) {
-          totalMensal += expenseAmount;
-        }
+        if (expenseDate >= inicioDoDia) totalDiario += expenseAmount;
+        if (expenseDate >= inicioDoMes) totalMensal += expenseAmount;
       }
     });
 
     totalAmountSpan.textContent = totalGeral.toFixed(2);
     dailyTotalSpan.textContent = totalDiario.toFixed(2);
     monthlyTotalSpan.textContent = totalMensal.toFixed(2);
-    renderOrUpdateChart(categoryTotals);
+    
+    renderOrUpdateChart(categoryTotals, totalGeral);
   }
 
-  function renderOrUpdateChart(categoryData) {
+ 
+
+  
+  const centerTextPlugin = {
+    id: 'centerText',
+    afterDraw: (chart) => {
+      if (chart.data.datasets[0].data.length === 0) return;
+      
+      const ctx = chart.ctx;
+      const { top, bottom, left, right, width, height } = chart.chartArea;
+      const centerX = left + width / 2;
+      const centerY = top + height / 2;
+
+      
+      ctx.font = '16px Inter';
+      ctx.fillStyle = '#64748B'; 
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('Total', centerX, centerY);
+
+      
+      const mainTitle = chart.options.plugins.centerText.mainTitle;
+      ctx.font = 'bold 24px Inter';
+      ctx.fillStyle = '#1E293B'; 
+      ctx.textBaseline = 'top';
+      ctx.fillText(mainTitle, centerX, centerY);
+    }
+  };
+
+  function renderOrUpdateChart(categoryData, totalGeral) {
     if (expenseChart) {
       expenseChart.destroy();
     }
+    
+    
     expenseChart = new Chart(chartCanvas, {
-      type: "pie",
+      type: 'doughnut', 
       data: {
         labels: Object.keys(categoryData),
-        datasets: [
-          {
-            label: "Gastos por Categoria",
-            data: Object.values(categoryData),
-            backgroundColor: [
-              "#FF6384",
-              "#36A2EB",
-              "#FFCE56",
-              "#4BC0C0",
-              "#9966FF",
-              "#FF9F40",
-            ],
-          },
-        ],
+        datasets: [{
+          label: "Gastos por Categoria",
+          data: Object.values(categoryData),
+          backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"],
+          borderWidth: 0, 
+        }],
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
+        cutout: '70%', 
         plugins: {
-          legend: { position: "top" },
-          title: {
-            display: true,
-            text: "Distribuição de Gastos por Categoria",
+          legend: {
+            position: 'bottom',
           },
+          
+          title: {
+            display: false,
+          },
+          
+          centerText: {
+            mainTitle: `R$ ${totalGeral.toFixed(2)}`
+          }
         },
       },
+      
+      plugins: [centerTextPlugin]
     });
   }
+  
 
   async function addExpenseToDB(description, category, amount, userId) {
     try {
-      await db.collection("users").doc(userId).collection("gastos").add({
-        description: description,
-        category: category,
-        amount: amount,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        ownerId: userId,
-      });
-      console.log("Gasto adicionado com sucesso na subcoleção do usuário!");
+      await db.collection("users").doc(userId).collection("gastos").add({ description, category, amount, createdAt: firebase.firestore.FieldValue.serverTimestamp(), ownerId: userId });
+      console.log("Gasto adicionado com sucesso!");
     } catch (error) {
       console.error("Erro ao adicionar gasto: ", error);
       alert("Não foi possível salvar o gasto.");
@@ -300,15 +265,9 @@ document.addEventListener("DOMContentLoaded", () => {
   async function deleteExpenseFromDB(id) {
     const user = auth.currentUser;
     if (!user) return;
-
     if (confirm("Tem certeza que deseja excluir este gasto?")) {
       try {
-        await db
-          .collection("users")
-          .doc(user.uid)
-          .collection("gastos")
-          .doc(id)
-          .delete();
+        await db.collection("users").doc(user.uid).collection("gastos").doc(id).delete();
         console.log("Gasto excluído com sucesso!");
       } catch (error) {
         console.error("Erro ao excluir gasto: ", error);
@@ -320,20 +279,9 @@ document.addEventListener("DOMContentLoaded", () => {
   expenseForm.addEventListener("submit", (event) => {
     event.preventDefault();
     const user = auth.currentUser;
-    if (!user) {
-      alert("Você precisa estar logado para adicionar um gasto.");
-      return;
-    }
-    const description = descriptionInput.value;
-    const category = categoryInput.value;
-    const amount = parseFloat(amountInput.value);
-
-    if (
-      description.trim() !== "" &&
-      category !== "" &&
-      !isNaN(amount) &&
-      amount > 0
-    ) {
+    if (!user) return alert("Você precisa estar logado para adicionar um gasto.");
+    const description = descriptionInput.value, category = categoryInput.value, amount = parseFloat(amountInput.value);
+    if (description.trim() !== "" && category !== "" && !isNaN(amount) && amount > 0) {
       addExpenseToDB(description, category, amount, user.uid);
       expenseForm.reset();
       descriptionInput.focus();
