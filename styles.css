@@ -75,9 +75,9 @@ button:hover {
     background-color: #0056b3;
 }
 
-/* --- NOVOS ESTILOS PARA AUTENTICAÇÃO --- */
+
 .auth-btn {
-    background-color: #4285F4; /* Cor do Google */
+    background-color: #4285F4;
 }
 .auth-btn:hover {
     background-color: #357ae8;
@@ -93,7 +93,7 @@ button:hover {
 .auth-btn-logout:hover {
     background-color: #5a6268;
 }
-/* --- FIM DOS NOVOS ESTILOS --- */
+
 
 
 #expense-list {
