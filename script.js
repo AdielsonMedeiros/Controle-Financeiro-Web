@@ -6,7 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const db = firebase.firestore();
   const auth = firebase.auth();
 
-  // Elementos de Autenticação
+  let pendingCredential;
+
   const authContainer = document.getElementById("auth-container");
   const loginView = document.getElementById("login-view");
   const registerView = document.getElementById("register-view");
@@ -22,23 +23,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const registerBtn = document.getElementById("register-btn");
 
   const googleLoginBtn = document.getElementById("login-google-icon-btn");
-  const facebookLoginBtn = document.getElementById("login-facebook-icon-btn");
+  const githubLoginBtn = document.getElementById("login-github-icon-btn");
 
   const logoutBtn = document.getElementById("logout-btn");
   const userInfo = document.getElementById("user-info");
   const userEmailSpan = document.getElementById("user-email");
-  // NOVO SELETOR PARA O AVATAR
+
   const userAvatar = document.getElementById("user-avatar");
   const appContent = document.getElementById("app-content");
 
-  // Elementos da Aplicação
   const expenseForm = document.getElementById("expense-form");
   const descriptionInput = document.getElementById("description");
   const categoryInput = document.getElementById("category");
   const amountInput = document.getElementById("amount");
   const expenseList = document.getElementById("expense-list");
 
-  // Elementos de Métricas
   const totalAmountSpan = document.getElementById("total-amount");
   const dailyTotalSpan = document.getElementById("daily-total");
   const monthlyTotalSpan = document.getElementById("monthly-total");
@@ -46,8 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let expenseChart;
 
   let unsubscribeFromExpenses;
-
-  // --- LÓGICA DE AUTENTICAÇÃO ---
 
   showRegisterLink.addEventListener("click", (e) => {
     e.preventDefault();
@@ -61,25 +58,55 @@ document.addEventListener("DOMContentLoaded", () => {
     loginView.style.display = "block";
   });
 
-  // Login com Google
+  // --- FUNÇÃO handleProviderLogin TOTALMENTE CORRIGIDA ---
+  function handleProviderLogin(provider) {
+    auth.signInWithPopup(provider).catch((error) => {
+      if (error.code === "auth/account-exists-with-different-credential") {
+        pendingCredential = error.credential;
+        auth.fetchSignInMethodsForEmail(error.email).then((methods) => {
+          
+          // Lógica de tradução do nome do provedor
+          let providerName = "seu método original"; // Mensagem padrão
+          if (methods && methods.length > 0) {
+            const providerId = methods[0];
+            if (providerId === 'password') {
+                providerName = 'E-mail e Senha';
+            } else if (providerId === 'google.com') {
+                providerName = 'Google';
+            } else if (providerId === 'github.com') {
+                providerName = 'GitHub';
+            } else {
+                providerName = providerId;
+            }
+          } else {
+            // Se o array vier vazio, é quase certeza que a conta foi criada
+            // com e-mail e senha, mas nunca usada com um provedor social.
+            providerName = 'E-mail e Senha';
+          }
+
+          alert(
+            `Você já tem uma conta com este e-mail usando o método: ${providerName}. ` +
+            `Por favor, faça login com este método para vincular sua nova conta.`
+          );
+        });
+      } else {
+        console.error(`Erro no login com ${provider.providerId}: `, error);
+        alert(`Erro ao fazer login: ${error.message}`);
+      }
+    });
+  }
+
   googleLoginBtn.addEventListener("click", () => {
     const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider).catch((error) => {
-      console.error("Erro no login com Google: ", error);
-      alert(`Erro: ${error.message}`);
-    });
+    handleProviderLogin(provider);
   });
 
-  // NOVA LÓGICA PARA LOGIN COM FACEBOOK
-  facebookLoginBtn.addEventListener("click", () => {
-    const provider = new firebase.auth.FacebookAuthProvider();
-    auth.signInWithPopup(provider).catch((error) => {
-      console.error("Erro no login com Facebook: ", error);
-      alert(`Erro ao fazer login com Facebook: ${error.message}`);
-    });
+  githubLoginBtn.addEventListener("click", () => {
+    const provider = new firebase.auth.GithubAuthProvider();
+    handleProviderLogin(provider);
   });
+  // --- FIM DAS CORREÇÕES ---
 
-  // Login com E-mail e Senha
   loginEmailBtn.addEventListener("click", () => {
     const email = loginEmailInput.value;
     const password = loginPasswordInput.value;
@@ -93,7 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Registro com E-mail e Senha
   registerBtn.addEventListener("click", () => {
     const email = registerEmailInput.value;
     const password = registerPasswordInput.value;
@@ -109,42 +135,48 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   });
 
-  // Logout
   logoutBtn.addEventListener("click", () => {
     auth.signOut();
   });
 
-  // Observador de estado de autenticação (ATUALIZADO)
   auth.onAuthStateChanged((user) => {
     if (user) {
-      // Usuário está logado
+      if (pendingCredential) {
+        user.linkWithCredential(pendingCredential)
+          .then(() => {
+            console.log("Conta vinculada com sucesso!");
+            alert("Sua conta foi vinculada com sucesso!");
+            pendingCredential = null;
+          })
+          .catch((error) => {
+            console.error("Erro ao vincular conta:", error);
+            alert(`Não foi possível vincular a conta: ${error.message}`);
+            pendingCredential = null;
+          });
+      }
+      
       authContainer.style.display = "none";
-      userInfo.style.display = "flex"; // MUDADO PARA FLEX
+      userInfo.style.display = "flex";
       appContent.style.display = "block";
       userEmailSpan.textContent = user.email;
 
-      // --- LÓGICA PARA ATUALIZAR O AVATAR ---
-      // Se o usuário tiver uma foto (photoURL), use-a. Senão, use um avatar padrão.
-      const avatarUrl = user.photoURL || `https://ui-avatars.com/api/?name=${user.email}&background=random`;
+      const avatarUrl =
+        user.photoURL ||
+        `https://ui-avatars.com/api/?name=${user.email}&background=random`;
       userAvatar.src = avatarUrl;
-      // --- FIM DA LÓGICA DO AVATAR ---
 
       loadAndListenForExpenses(user.uid);
     } else {
-      // Usuário está deslogado
       authContainer.style.display = "block";
       userInfo.style.display = "none";
       appContent.style.display = "none";
-      expenseList.innerHTML = ""; // Limpa a lista de gastos
+      expenseList.innerHTML = "";
 
-      // Cancela a inscrição de ouvinte de gastos
       if (unsubscribeFromExpenses) {
         unsubscribeFromExpenses();
       }
     }
   });
-
-  // --- LÓGICA DA APLICAÇÃO DE GASTOS ---
 
   function loadAndListenForExpenses(userId) {
     const query = db
@@ -284,8 +316,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   }
-
-  // --- EVENT LISTENERS DA APLICAÇÃO ---
 
   expenseForm.addEventListener("submit", (event) => {
     event.preventDefault();
