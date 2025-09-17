@@ -113,18 +113,6 @@ button:hover {
     transform: translateY(-2px); /* Efeito de "levantar" */
 }
 
-/* Botão de Logout */
-.auth-btn-logout {
-    width: auto;
-    padding: 8px 15px;
-    background-color: var(--cor-texto-suave);
-    font-size: 14px;
-    margin-top: 5px;
-}
-.auth-btn-logout:hover {
-    background-color: var(--cor-texto);
-}
-
 /* Botão de Registrar */
 #register-btn {
   background-color: var(--cor-sucesso);
@@ -279,4 +267,67 @@ button:hover {
 .social-icon-btn img {
     width: 55%; /* Ajusta o tamanho do logo dentro do círculo */
     height: auto;
+}
+
+/* --- NOVOS ESTILOS PARA A ÁREA DE INFORMAÇÕES DO USUÁRIO --- */
+
+#user-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Alinha avatar à esquerda e o resto à direita */
+    margin-bottom: 30px;
+    gap: 15px; /* Espaçamento entre o avatar e o texto */
+    background-color: #f8fafc;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: 1px solid var(--cor-borda);
+}
+
+#user-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%; /* Deixa a imagem redonda */
+    object-fit: cover; /* Garante que a imagem preencha o círculo sem distorcer */
+    border: 2px solid var(--cor-container);
+    box-shadow: 0 0 0 2px var(--cor-primaria);
+}
+
+.user-details {
+    display: flex;
+    align-items: center; /* Alinha o texto e o botão na mesma linha */
+    gap: 15px;
+    flex-grow: 1; /* Faz esta div ocupar o espaço disponível */
+}
+
+.user-details p {
+    margin: 0;
+    font-size: 15px;
+    color: var(--cor-texto-suave);
+    flex-grow: 1; /* Ocupa espaço para empurrar o botão para a direita */
+}
+
+.user-details span#user-email {
+    font-weight: 500;
+    color: var(--cor-texto);
+}
+
+/* Melhorando o botão de logout */
+#logout-btn {
+    width: auto;
+    padding: 8px 18px;
+    background-color: #f1f5f9;
+    color: var(--cor-texto-suave);
+    font-size: 14px;
+    font-weight: 500;
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+    margin: 0;
+    flex-shrink: 0; /* Impede que o botão encolha */
+}
+
+#logout-btn:hover {
+    background-color: var(--cor-erro);
+    color: #fff;
+    border-color: var(--cor-erro);
+    transform: none; /* Remove o efeito de levantar */
 }

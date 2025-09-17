@@ -21,13 +21,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const registerPasswordInput = document.getElementById("register-password");
   const registerBtn = document.getElementById("register-btn");
 
-  // SELETORES ATUALIZADOS PARA OS ÍCONES
   const googleLoginBtn = document.getElementById("login-google-icon-btn");
   const facebookLoginBtn = document.getElementById("login-facebook-icon-btn");
 
   const logoutBtn = document.getElementById("logout-btn");
   const userInfo = document.getElementById("user-info");
   const userEmailSpan = document.getElementById("user-email");
+  // NOVO SELETOR PARA O AVATAR
+  const userAvatar = document.getElementById("user-avatar");
   const appContent = document.getElementById("app-content");
 
   // Elementos da Aplicação
@@ -113,14 +114,20 @@ document.addEventListener("DOMContentLoaded", () => {
     auth.signOut();
   });
 
-  // Observador de estado de autenticação
+  // Observador de estado de autenticação (ATUALIZADO)
   auth.onAuthStateChanged((user) => {
     if (user) {
       // Usuário está logado
       authContainer.style.display = "none";
-      userInfo.style.display = "block";
+      userInfo.style.display = "flex"; // MUDADO PARA FLEX
       appContent.style.display = "block";
       userEmailSpan.textContent = user.email;
+
+      // --- LÓGICA PARA ATUALIZAR O AVATAR ---
+      // Se o usuário tiver uma foto (photoURL), use-a. Senão, use um avatar padrão.
+      const avatarUrl = user.photoURL || `https://ui-avatars.com/api/?name=${user.email}&background=random`;
+      userAvatar.src = avatarUrl;
+      // --- FIM DA LÓGICA DO AVATAR ---
 
       loadAndListenForExpenses(user.uid);
     } else {
