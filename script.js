@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const db = firebase.firestore();
   const auth = firebase.auth();
 
-  
+  // Elementos de Autenticação
   const authContainer = document.getElementById("auth-container");
   const loginView = document.getElementById("login-view");
   const registerView = document.getElementById("register-view");
@@ -21,20 +21,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const registerPasswordInput = document.getElementById("register-password");
   const registerBtn = document.getElementById("register-btn");
 
-  const googleLoginBtn = document.getElementById("login-google-btn");
+  // SELETORES ATUALIZADOS PARA OS ÍCONES
+  const googleLoginBtn = document.getElementById("login-google-icon-btn");
+  const facebookLoginBtn = document.getElementById("login-facebook-icon-btn");
+
   const logoutBtn = document.getElementById("logout-btn");
   const userInfo = document.getElementById("user-info");
   const userEmailSpan = document.getElementById("user-email");
   const appContent = document.getElementById("app-content");
 
-  
+  // Elementos da Aplicação
   const expenseForm = document.getElementById("expense-form");
   const descriptionInput = document.getElementById("description");
   const categoryInput = document.getElementById("category");
   const amountInput = document.getElementById("amount");
   const expenseList = document.getElementById("expense-list");
 
-  
+  // Elementos de Métricas
   const totalAmountSpan = document.getElementById("total-amount");
   const dailyTotalSpan = document.getElementById("daily-total");
   const monthlyTotalSpan = document.getElementById("monthly-total");
@@ -43,9 +46,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let unsubscribeFromExpenses;
 
-  
+  // --- LÓGICA DE AUTENTICAÇÃO ---
 
-  
   showRegisterLink.addEventListener("click", (e) => {
     e.preventDefault();
     loginView.style.display = "none";
@@ -58,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loginView.style.display = "block";
   });
 
-  
+  // Login com Google
   googleLoginBtn.addEventListener("click", () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     auth.signInWithPopup(provider).catch((error) => {
@@ -67,7 +69,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  
+  // NOVA LÓGICA PARA LOGIN COM FACEBOOK
+  facebookLoginBtn.addEventListener("click", () => {
+    const provider = new firebase.auth.FacebookAuthProvider();
+    auth.signInWithPopup(provider).catch((error) => {
+      console.error("Erro no login com Facebook: ", error);
+      alert(`Erro ao fazer login com Facebook: ${error.message}`);
+    });
+  });
+
+  // Login com E-mail e Senha
   loginEmailBtn.addEventListener("click", () => {
     const email = loginEmailInput.value;
     const password = loginPasswordInput.value;
@@ -81,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  
+  // Registro com E-mail e Senha
   registerBtn.addEventListener("click", () => {
     const email = registerEmailInput.value;
     const password = registerPasswordInput.value;
@@ -97,15 +108,15 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   });
 
-  
+  // Logout
   logoutBtn.addEventListener("click", () => {
     auth.signOut();
   });
 
-  
+  // Observador de estado de autenticação
   auth.onAuthStateChanged((user) => {
     if (user) {
-      
+      // Usuário está logado
       authContainer.style.display = "none";
       userInfo.style.display = "block";
       appContent.style.display = "block";
@@ -113,22 +124,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
       loadAndListenForExpenses(user.uid);
     } else {
-      
+      // Usuário está deslogado
       authContainer.style.display = "block";
       userInfo.style.display = "none";
       appContent.style.display = "none";
-      expenseList.innerHTML = ""; 
+      expenseList.innerHTML = ""; // Limpa a lista de gastos
 
-      
+      // Cancela a inscrição de ouvinte de gastos
       if (unsubscribeFromExpenses) {
         unsubscribeFromExpenses();
       }
     }
   });
 
-  
+  // --- LÓGICA DA APLICAÇÃO DE GASTOS ---
 
-  
   function loadAndListenForExpenses(userId) {
     const query = db
       .collection("users")
@@ -145,7 +155,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     );
   }
-  
 
   function renderExpensesAndMetrics(docs) {
     expenseList.innerHTML = "";
@@ -233,7 +242,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  
   async function addExpenseToDB(description, category, amount, userId) {
     try {
       await db.collection("users").doc(userId).collection("gastos").add({
@@ -241,7 +249,7 @@ document.addEventListener("DOMContentLoaded", () => {
         category: category,
         amount: amount,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        ownerId: userId, 
+        ownerId: userId,
       });
       console.log("Gasto adicionado com sucesso na subcoleção do usuário!");
     } catch (error) {
@@ -249,16 +257,19 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Não foi possível salvar o gasto.");
     }
   }
-  
 
   async function deleteExpenseFromDB(id) {
     const user = auth.currentUser;
-    if (!user) return; 
+    if (!user) return;
 
     if (confirm("Tem certeza que deseja excluir este gasto?")) {
       try {
-        
-        await db.collection("users").doc(user.uid).collection("gastos").doc(id).delete();
+        await db
+          .collection("users")
+          .doc(user.uid)
+          .collection("gastos")
+          .doc(id)
+          .delete();
         console.log("Gasto excluído com sucesso!");
       } catch (error) {
         console.error("Erro ao excluir gasto: ", error);
@@ -267,7 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  
+  // --- EVENT LISTENERS DA APLICAÇÃO ---
 
   expenseForm.addEventListener("submit", (event) => {
     event.preventDefault();

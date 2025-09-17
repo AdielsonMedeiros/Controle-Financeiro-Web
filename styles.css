@@ -1,4 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+/* Importa a fonte do Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+/* --- VARIÁVEIS DE COR (TEMA DA APLICAÇÃO) ---
+  Mudar uma cor aqui muda em todo o site. Facilita a manutenção.
+*/
+:root {
+    --cor-primaria: #4F46E5; /* Um roxo/azul moderno */
+    --cor-primaria-hover: #4338CA;
+    --cor-fundo: #F8FAFC;
+    --cor-container: #FFFFFF;
+    --cor-texto: #1E293B;
+    --cor-texto-suave: #64748B;
+    --cor-borda: #E2E8F0;
+    --cor-sucesso: #10B981;
+    --cor-erro: #EF4444;
+    --sombra-card: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
 
 * {
     box-sizing: border-box;
@@ -7,229 +24,259 @@
 }
 
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f4f4f9;
-    color: #333;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--cor-fundo);
+    /* Um gradiente sutil para um fundo mais interessante */
+    background-image: linear-gradient(170deg, #f0f4ff 0%, #f8fafc 100%);
+    color: var(--cor-texto);
     display: flex;
     justify-content: center;
     align-items: flex-start;
     min-height: 100vh;
-    padding-top: 40px;
+    padding: 40px 20px;
 }
 
 .container {
-    background-color: #fff;
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: var(--cor-container);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: var(--sombra-card);
     width: 100%;
     max-width: 500px;
+    border: 1px solid var(--cor-borda);
 }
 
 h1, h2, h3 {
     text-align: center;
-    margin-bottom: 20px;
-    color: #444;
+    margin-bottom: 25px;
+    color: var(--cor-texto);
+    font-weight: 700;
 }
 
 hr {
     border: 0;
     height: 1px;
-    background: #ddd;
-    margin: 20px 0;
+    background: var(--cor-borda);
+    margin: 30px 0;
 }
 
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--cor-texto-suave);
 }
 
+/* Estilo unificado para inputs e select */
 input[type="text"],
-input[type="number"] {
+input[type="number"],
+input[type="password"],
+select {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    padding: 12px 15px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
     font-size: 16px;
+    background-color: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* Efeito de foco profissional para inputs */
+input:focus,
+select:focus {
+    outline: none;
+    border-color: var(--cor-primaria);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+}
+
+/* Botão principal */
 button {
     width: 100%;
-    padding: 12px;
-    background-color: #007bff;
+    padding: 14px;
+    background-color: var(--cor-primaria);
     color: #fff;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 16px;
     cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
+    font-weight: 500;
+    transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: var(--cor-primaria-hover);
+    transform: translateY(-2px); /* Efeito de "levantar" */
 }
 
-
-.auth-btn {
-    background-color: #4285F4;
-}
-.auth-btn:hover {
-    background-color: #357ae8;
-}
-
+/* Botão de Logout */
 .auth-btn-logout {
     width: auto;
     padding: 8px 15px;
-    background-color: #6c757d;
+    background-color: var(--cor-texto-suave);
     font-size: 14px;
     margin-top: 5px;
 }
 .auth-btn-logout:hover {
-    background-color: #5a6268;
+    background-color: var(--cor-texto);
 }
 
+/* Botão de Registrar */
+#register-btn {
+  background-color: var(--cor-sucesso);
+}
+#register-btn:hover {
+  background-color: #059669;
+}
 
-
+/* Lista de Gastos */
 #expense-list {
     list-style-type: none;
     padding: 0;
 }
 
 #expense-list li {
-    background-color: #e9ecef;
-    padding: 15px;
-    border-radius: 4px;
-    margin-bottom: 10px;
+    background-color: transparent; /* Fundo transparente */
+    padding: 15px 0;
+    border-bottom: 1px solid var(--cor-borda); /* Apenas uma linha divisória */
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 16px;
+    transition: background-color 0.2s ease;
+}
+#expense-list li:last-child {
+    border-bottom: none; /* Remove a borda do último item */
+}
+#expense-list li:hover {
+    background-color: #f9fafb;
 }
 
 #expense-list li .expense-info {
     display: flex;
     flex-direction: column;
+    gap: 4px; /* Espaçamento entre descrição e valor */
     flex-grow: 1;
 }
 
-#expense-list li span:last-child {
-    font-weight: bold;
-    color: #c92a2a; 
-    margin-top: 5px;
+#expense-list li .expense-info span:first-child em {
+    font-size: 13px;
+    color: var(--cor-texto-suave);
+    font-style: normal;
+}
+
+#expense-list li .expense-info span:last-child {
+    font-weight: 500;
+    color: var(--cor-texto);
+    margin-top: 0;
 }
 
 .delete-btn {
     width: auto;
     padding: 8px 12px;
-    background-color: #dc3545;
+    background-color: transparent;
+    color: var(--cor-texto-suave);
     font-size: 14px;
     margin-left: 15px;
+    border: 1px solid transparent;
 }
 
 .delete-btn:hover {
-    background-color: #c82333;
+    background-color: #fee2e2;
+    color: var(--cor-erro);
+    border-color: #fecaca;
+    transform: none; /* Remove o efeito de levantar para este botão */
 }
 
-.total {
+.total, .metrics {
     text-align: right;
-    margin-top: 20px;
-    font-size: 18px;
+    margin-top: 25px;
+    font-size: 16px;
+    line-height: 1.6;
 }
 
-.total h3 {
-    text-align: right;
-}
+.total h3 { text-align: right; }
 
 #total-amount {
-    font-weight: bold;
-    color: #28a745;
-}
-
-select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-    background-color: white;
-}
-
-.metrics {
-    text-align: right;
-    margin-top: 20px;
-    font-size: 16px;
-    line-height: 1.5;
-}
-
-.metrics p {
-    margin-bottom: 5px;
-}
-
-.metrics span {
-    font-weight: bold;
-    color: #333;
+    font-weight: 700;
+    color: var(--cor-primaria);
+    font-size: 22px;
 }
 
 .chart-container {
     width: 100%;
     max-width: 400px;
-    margin: 20px auto;
+    margin: 30px auto;
 }
 
+/* Seção de Autenticação */
 .auth-title {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   font-size: 18px;
-  color: #555;
-}
-
-input[type="password"] {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-}
-
-.auth-hr {
-  margin: 25px 0;
-  border: 0;
-  height: 1px;
-  background: #eee;
-}
-
-#login-email-btn {
-  background-color: #007bff;
-}
-#login-email-btn:hover {
-  background-color: #0056b3;
+  color: var(--cor-texto-suave);
 }
 
 .toggle-auth {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 25px;
   font-size: 15px;
 }
 
 .toggle-auth a {
-  color: #007bff;
+  color: var(--cor-primaria);
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .toggle-auth a:hover {
   text-decoration: underline;
 }
 
-#register-btn {
-  background-color: #28a745;
+/* --- ESTILOS PARA LOGIN SOCIAL COM ÍCONES --- */
+.social-login-section {
+    margin: 25px 0;
 }
-#register-btn:hover {
-  background-color: #218838;
+
+.social-login-title {
+    text-align: center;
+    color: var(--cor-texto-suave);
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.social-login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px; /* Espaçamento entre os ícones */
+}
+
+.social-icon-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;   /* Largura do botão */
+    height: 50px;  /* Altura do botão */
+    padding: 0;
+    background-color: var(--cor-container);
+    border: 1px solid var(--cor-borda);
+    border-radius: 50%; /* Deixa o botão redondo */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.social-icon-btn:hover {
+    transform: scale(1.1); /* Aumenta o ícone no hover */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.social-icon-btn img {
+    width: 55%; /* Ajusta o tamanho do logo dentro do círculo */
+    height: auto;
 }
