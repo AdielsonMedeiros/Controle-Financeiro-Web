@@ -1,11 +1,9 @@
-/* Importa a fonte do Google Fonts */
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 
-/* --- VARIÁVEIS DE COR (TEMA DA APLICAÇÃO) ---
-  Mudar uma cor aqui muda em todo o site. Facilita a manutenção.
-*/
+
 :root {
-    --cor-primaria: #4F46E5; /* Um roxo/azul moderno */
+    --cor-primaria: #4F46E5;
     --cor-primaria-hover: #4338CA;
     --cor-fundo: #F8FAFC;
     --cor-container: #FFFFFF;
@@ -26,7 +24,7 @@
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--cor-fundo);
-    /* Um gradiente sutil para um fundo mais interessante */
+   
     background-image: linear-gradient(170deg, #f0f4ff 0%, #f8fafc 100%);
     color: var(--cor-texto);
     display: flex;
@@ -72,7 +70,7 @@ label {
     color: var(--cor-texto-suave);
 }
 
-/* Estilo unificado para inputs e select */
+
 input[type="text"],
 input[type="number"],
 input[type="password"],
@@ -86,7 +84,7 @@ select {
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Efeito de foco profissional para inputs */
+
 input:focus,
 select:focus {
     outline: none;
@@ -94,7 +92,7 @@ select:focus {
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
 }
 
-/* Botão principal */
+
 button {
     width: 100%;
     padding: 14px;
@@ -110,10 +108,10 @@ button {
 
 button:hover {
     background-color: var(--cor-primaria-hover);
-    transform: translateY(-2px); /* Efeito de "levantar" */
+    transform: translateY(-2px);
 }
 
-/* Botão de Registrar */
+
 #register-btn {
   background-color: var(--cor-sucesso);
 }
@@ -121,16 +119,16 @@ button:hover {
   background-color: #059669;
 }
 
-/* Lista de Gastos */
+
 #expense-list {
     list-style-type: none;
     padding: 0;
 }
 
 #expense-list li {
-    background-color: transparent; /* Fundo transparente */
+    background-color: transparent;
     padding: 15px 0;
-    border-bottom: 1px solid var(--cor-borda); /* Apenas uma linha divisória */
+    border-bottom: 1px solid var(--cor-borda);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -138,7 +136,7 @@ button:hover {
     transition: background-color 0.2s ease;
 }
 #expense-list li:last-child {
-    border-bottom: none; /* Remove a borda do último item */
+    border-bottom: none;
 }
 #expense-list li:hover {
     background-color: #f9fafb;
@@ -147,7 +145,7 @@ button:hover {
 #expense-list li .expense-info {
     display: flex;
     flex-direction: column;
-    gap: 4px; /* Espaçamento entre descrição e valor */
+    gap: 4px;
     flex-grow: 1;
 }
 
@@ -177,7 +175,7 @@ button:hover {
     background-color: #fee2e2;
     color: var(--cor-erro);
     border-color: #fecaca;
-    transform: none; /* Remove o efeito de levantar para este botão */
+    transform: none;
 }
 
 .total, .metrics {
@@ -201,7 +199,7 @@ button:hover {
     margin: 30px auto;
 }
 
-/* Seção de Autenticação */
+
 .auth-title {
   text-align: center;
   margin-bottom: 25px;
@@ -225,7 +223,7 @@ button:hover {
   text-decoration: underline;
 }
 
-/* --- ESTILOS PARA LOGIN SOCIAL COM ÍCONES --- */
+
 .social-login-section {
     margin: 25px 0;
 }
@@ -241,42 +239,42 @@ button:hover {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 20px; /* Espaçamento entre os ícones */
+    gap: 20px;
 }
 
 .social-icon-btn {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 50px;   /* Largura do botão */
-    height: 50px;  /* Altura do botão */
+    width: 50px;  
+    height: 50px; 
     padding: 0;
     background-color: var(--cor-container);
     border: 1px solid var(--cor-borda);
-    border-radius: 50%; /* Deixa o botão redondo */
+    border-radius: 50%;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .social-icon-btn:hover {
-    transform: scale(1.1); /* Aumenta o ícone no hover */
+    transform: scale(1.1);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .social-icon-btn img {
-    width: 55%; /* Ajusta o tamanho do logo dentro do círculo */
+    width: 55%;
     height: auto;
 }
 
-/* --- NOVOS ESTILOS PARA A ÁREA DE INFORMAÇÕES DO USUÁRIO --- */
+
 
 #user-info {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Alinha avatar à esquerda e o resto à direita */
+    justify-content: space-between;
     margin-bottom: 30px;
-    gap: 15px; /* Espaçamento entre o avatar e o texto */
+    gap: 15px;
     background-color: #f8fafc;
     padding: 12px 20px;
     border-radius: 10px;
@@ -286,24 +284,24 @@ button:hover {
 #user-avatar {
     width: 45px;
     height: 45px;
-    border-radius: 50%; /* Deixa a imagem redonda */
-    object-fit: cover; /* Garante que a imagem preencha o círculo sem distorcer */
+    border-radius: 50%;
+    object-fit: cover;
     border: 2px solid var(--cor-container);
     box-shadow: 0 0 0 2px var(--cor-primaria);
 }
 
 .user-details {
     display: flex;
-    align-items: center; /* Alinha o texto e o botão na mesma linha */
+    align-items: center;
     gap: 15px;
-    flex-grow: 1; /* Faz esta div ocupar o espaço disponível */
+    flex-grow: 1;
 }
 
 .user-details p {
     margin: 0;
     font-size: 15px;
     color: var(--cor-texto-suave);
-    flex-grow: 1; /* Ocupa espaço para empurrar o botão para a direita */
+    flex-grow: 1;
 }
 
 .user-details span#user-email {
@@ -311,7 +309,7 @@ button:hover {
     color: var(--cor-texto);
 }
 
-/* Melhorando o botão de logout */
+
 #logout-btn {
     width: auto;
     padding: 8px 18px;
@@ -322,12 +320,94 @@ button:hover {
     border: 1px solid var(--cor-borda);
     border-radius: 8px;
     margin: 0;
-    flex-shrink: 0; /* Impede que o botão encolha */
+    flex-shrink: 0;
 }
 
 #logout-btn:hover {
     background-color: var(--cor-erro);
     color: #fff;
     border-color: var(--cor-erro);
-    transform: none; /* Remove o efeito de levantar */
+    transform: none;
+}
+
+
+
+
+@media (max-width: 768px) {
+    body {
+       
+        padding: 30px 15px;
+    }
+
+    .container {
+       
+        padding: 30px;
+    }
+}
+
+
+
+@media (max-width: 576px) {
+    body {
+       
+        padding: 20px 10px;
+    }
+
+    .container {
+       
+        padding: 20px;
+    }
+
+    h1 {
+       
+        font-size: 28px;
+    }
+
+    h2 {
+       
+        font-size: 22px;
+    }
+
+   
+    #user-info {
+        padding: 10px 15px;
+        gap: 10px;
+    }
+
+    #user-avatar {
+        width: 40px;
+        height: 40px;
+    }
+
+    .user-details {
+       
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .user-details p {
+        font-size: 14px;
+    }
+
+    #logout-btn {
+       
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+    
+   
+    .social-icon-btn {
+        width: 45px;
+        height: 45px;
+    }
+    
+   
+    button {
+        padding: 12px;
+    }
+
+    .delete-btn {
+        padding: 6px 10px;
+    }
 }
