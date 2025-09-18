@@ -46,19 +46,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const incomeCategoryInput = document.getElementById("income-category");
   const incomeAmountInput = document.getElementById("income-amount");
   
-  // Listas e Métricas
+  // Listas, Métricas e Gráfico
   const transactionList = document.getElementById("transaction-list");
   const monthlyIncomeSpan = document.getElementById("monthly-income");
   const monthlyExpensesSpan = document.getElementById("monthly-expenses");
   const monthlyBalanceSpan = document.getElementById("monthly-balance");
   const chartCanvas = document.getElementById("expense-chart").getContext("2d");
 
+  // Orçamentos (NOVO)
+  const budgetSection = document.getElementById("budget-section");
+  const saveBudgetsBtn = document.getElementById("save-budgets-btn");
+
   // --- Estado do App --- //
   let expenseChart;
   let pendingCredential;
   let allTransactions = [];
+  let userBudgets = {}; // NOVO
   let unsubscribeFromExpenses;
   let unsubscribeFromIncomes;
+  let unsubscribeFromBudgets; // NOVO
 
   // --- Lógica de Autenticação (sem grandes alterações) --- //
   showRegisterLink.addEventListener("click", (e) => {
@@ -123,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
       setupUIForLoggedInUser(user);
-      loadUserTransactions(user.uid);
+      loadUserData(user.uid); // Função unificada
     } else {
       setupUIForLoggedOutUser();
     }
@@ -142,9 +148,12 @@ document.addEventListener("DOMContentLoaded", () => {
     authContainer.style.display = "block";
     appContent.style.display = "none";
     userInfo.style.display = "none";
+    // Limpa listeners e dados
     if (unsubscribeFromExpenses) unsubscribeFromExpenses();
     if (unsubscribeFromIncomes) unsubscribeFromIncomes();
+    if (unsubscribeFromBudgets) unsubscribeFromBudgets(); // NOVO
     allTransactions = [];
+    userBudgets = {}; // NOVO
     renderAll();
   }
 
@@ -160,7 +169,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // --- Funções do Firestore --- //
-  function loadUserTransactions(userId) {
+  function loadUserData(userId) {
+    // Carrega Transações
     const expensesQuery = db.collection("users").doc(userId).collection("gastos").orderBy("createdAt", "desc");
     const incomesQuery = db.collection("users").doc(userId).collection("receitas").orderBy("createdAt", "desc");
 
@@ -173,10 +183,16 @@ document.addEventListener("DOMContentLoaded", () => {
         const incomes = snapshot.docs.map(doc => ({ id: doc.id, type: 'income', ...doc.data() }));
         updateTransactions('income', incomes);
     });
+
+    // Carrega Orçamentos (NOVO)
+    const budgetDocRef = db.collection("users").doc(userId).collection("orcamentos").doc("mensal");
+    unsubscribeFromBudgets = budgetDocRef.onSnapshot(doc => {
+        userBudgets = doc.exists ? doc.data() : {};
+        renderAll(); // Re-renderiza tudo para atualizar o progresso dos orçamentos
+    });
   }
 
   function updateTransactions(type, data) {
-    // Remove transações antigas do mesmo tipo e adiciona as novas
     allTransactions = allTransactions.filter(t => t.type !== type).concat(data);
     renderAll();
   }
@@ -209,9 +225,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // NOVO: Função para salvar orçamentos
+  async function saveUserBudgets() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const budgetInputs = document.querySelectorAll('.budget-input');
+    const newBudgets = {};
+    budgetInputs.forEach(input => {
+      const category = input.dataset.category;
+      const amount = parseFloat(input.value);
+      if (category && !isNaN(amount) && amount >= 0) {
+        newBudgets[category] = amount;
+      }
+    });
+
+    try {
+      await db.collection("users").doc(user.uid).collection("orcamentos").doc("mensal").set(newBudgets, { merge: true });
+      alert("Orçamentos salvos com sucesso!");
+    } catch (error) {
+      console.error("Erro ao salvar orçamentos: ", error);
+      alert("Não foi possível salvar os orçamentos.");
+    }
+  }
+
   // --- Lógica de Renderização e Cálculos --- //
   function renderAll() {
-    // Ordena todas as transações pela data de criação
     allTransactions.sort((a, b) => {
         const dateA = a.createdAt ? a.createdAt.toDate() : new Date();
         const dateB = b.createdAt ? b.createdAt.toDate() : new Date();
@@ -266,6 +305,42 @@ document.addEventListener("DOMContentLoaded", () => {
     monthlyBalanceSpan.className = monthlyBalance >= 0 ? 'positive' : 'negative';
     
     renderOrUpdateChart(expenseCategoryTotals);
+    renderBudgetProgress(expenseCategoryTotals); // NOVO
+  }
+
+  // NOVO: Função para renderizar a seção de orçamentos
+  function renderBudgetProgress(spentByCategory) {
+    budgetSection.innerHTML = '';
+    const categories = [...expenseCategoryInput.options].map(opt => opt.value).filter(val => val);
+
+    categories.forEach(category => {
+      const budgetAmount = userBudgets[category] || 0;
+      const spentAmount = spentByCategory[category] || 0;
+      let progressPercent = 0;
+      if (budgetAmount > 0) {
+          progressPercent = (spentAmount / budgetAmount) * 100;
+      }
+
+      const isOverBudget = spentAmount > budgetAmount && budgetAmount > 0;
+
+      const item = document.createElement('div');
+      item.className = 'budget-item';
+      item.innerHTML = `
+        <div class="budget-info">
+          <span class="budget-category-label">${category}</span>
+          <div class="progress-bar-container">
+            <div class="progress-bar ${isOverBudget ? 'over-budget' : ''}" style="width: ${Math.min(progressPercent, 100)}%;"></div>
+          </div>
+          <span class="budget-progress-text ${isOverBudget ? 'over-budget-text' : ''}">
+            R$ ${spentAmount.toFixed(2)} / R$ ${budgetAmount.toFixed(2)}
+          </span>
+        </div>
+        <div class="budget-input-group">
+          <input type="number" step="0.01" class="budget-input" data-category="${category}" value="${budgetAmount > 0 ? budgetAmount.toFixed(2) : ''}" placeholder="Definir Orçamento">
+        </div>
+      `;
+      budgetSection.appendChild(item);
+    });
   }
 
   const centerTextPlugin = {
@@ -355,4 +430,7 @@ document.addEventListener("DOMContentLoaded", () => {
       deleteTransactionFromDB(id, type);
     }
   });
+
+  // NOVO: Event Listener para o botão de salvar orçamentos
+  saveBudgetsBtn.addEventListener('click', saveUserBudgets);
 });

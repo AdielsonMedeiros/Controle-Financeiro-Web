@@ -245,9 +245,6 @@ button:hover {
 .summary-item.balance strong.positive { color: var(--cor-sucesso); }
 .summary-item.balance strong.negative { color: var(--cor-erro); }
 
-
-/* --- FIM DOS ESTILOS NOVOS --- */
-
 .delete-btn {
     width: auto;
     padding: 8px 12px;
@@ -397,10 +394,99 @@ button:hover {
     transform: none;
 }
 
+
+/* --- INÍCIO DOS ESTILOS DE ORÇAMENTO --- */
+#budget-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.budget-item {
+    background-color: var(--cor-fundo);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid var(--cor-borda);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.budget-info {
+    display: grid;
+    grid-template-columns: 100px 1fr 1fr;
+    align-items: center;
+    gap: 15px;
+}
+
+.budget-category-label {
+    font-weight: 500;
+    font-size: 15px;
+    color: var(--cor-texto);
+    white-space: nowrap;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 12px;
+    background-color: #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%; /* Será definido via JS */
+    background-color: var(--cor-primaria);
+    border-radius: 10px;
+    transition: width 0.5s ease-out;
+}
+
+.progress-bar.over-budget {
+    background-color: var(--cor-erro);
+}
+
+.budget-progress-text {
+    font-size: 13px;
+    color: var(--cor-texto-suave);
+    text-align: right;
+    white-space: nowrap;
+}
+
+.budget-progress-text.over-budget-text {
+    color: var(--cor-erro);
+    font-weight: 500;
+}
+
+.budget-input-group {
+    display: flex;
+}
+
+.budget-input-group input {
+    flex-grow: 1;
+    text-align: right;
+    font-size: 15px;
+    padding: 8px 12px;
+}
+
+#save-budgets-btn {
+    background-color: var(--cor-sucesso);
+    margin-bottom: 15px;
+}
+
+#save-budgets-btn:hover {
+    background-color: #059669;
+}
+/* --- FIM DOS ESTILOS DE ORÇAMENTO --- */
+
+
 @media (max-width: 768px) {
     body { padding: 30px 15px; }
     .container { padding: 30px; }
     .summary-container { grid-template-columns: 1fr; }
+    .budget-info { grid-template-columns: 80px 1fr; grid-template-rows: auto auto; }
+    .budget-progress-text { grid-column: 2; text-align: left; }
 }
 
 @media (max-width: 576px) {
@@ -410,4 +496,6 @@ button:hover {
     h2 { font-size: 22px; }
     .user-details { flex-direction: column; align-items: flex-start; gap: 8px; }
     #user-avatar { width: 40px; height: 40px; }
+    .budget-info { grid-template-columns: 1fr; }
+    .budget-progress-text { text-align: left; }
 }
