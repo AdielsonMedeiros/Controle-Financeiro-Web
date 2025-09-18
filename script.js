@@ -25,59 +25,60 @@ document.addEventListener("DOMContentLoaded", () => {
   const githubLoginBtn = document.getElementById("login-github-icon-btn");
   const logoutBtn = document.getElementById("logout-btn");
 
-  // Info do Usuário
+  // UI do Usuário
   const userInfo = document.getElementById("user-info");
   const userEmailSpan = document.getElementById("user-email");
   const userAvatar = document.getElementById("user-avatar");
 
-  // Abas e Formulários
+  // Navegação e Abas
   const tabs = document.querySelectorAll(".tab-btn");
   const formContainers = document.querySelectorAll(".form-container");
-  
-  // Formulário de Despesas
+  const showMainViewBtn = document.getElementById("show-main-view-btn");
+  const showReportsViewBtn = document.getElementById("show-reports-view-btn");
+  const mainView = document.getElementById("main-view");
+  const reportsView = document.getElementById("reports-view");
+
+  // Formulários
   const expenseForm = document.getElementById("expense-form");
   const expenseDescriptionInput = document.getElementById("expense-description");
   const expenseCategoryInput = document.getElementById("expense-category");
   const expenseAmountInput = document.getElementById("expense-amount");
-
-  // Formulário de Receitas
   const incomeForm = document.getElementById("income-form");
   const incomeDescriptionInput = document.getElementById("income-description");
   const incomeCategoryInput = document.getElementById("income-category");
   const incomeAmountInput = document.getElementById("income-amount");
   
-  // Listas, Métricas e Gráfico
+  // Exibição de Dados
   const transactionList = document.getElementById("transaction-list");
   const monthlyIncomeSpan = document.getElementById("monthly-income");
   const monthlyExpensesSpan = document.getElementById("monthly-expenses");
   const monthlyBalanceSpan = document.getElementById("monthly-balance");
+  
+  // Gráficos
   const chartCanvas = document.getElementById("expense-chart").getContext("2d");
+  const monthlyEvolutionChartCanvas = document.getElementById("monthly-evolution-chart").getContext("2d");
+  const categoryComparisonChartCanvas = document.getElementById("category-comparison-chart").getContext("2d");
 
-  // Orçamentos (NOVO)
+  // Orçamentos
   const budgetSection = document.getElementById("budget-section");
   const saveBudgetsBtn = document.getElementById("save-budgets-btn");
 
-  // --- Estado do App --- //
-  let expenseChart;
+  // Filtros
+  const periodFilter = document.getElementById("period-filter");
+  const customDateRange = document.getElementById("custom-date-range");
+  const startDateInput = document.getElementById("start-date");
+  const endDateInput = document.getElementById("end-date");
+
+  // --- Variáveis de Estado --- //
+  let expenseChart, monthlyEvolutionChart, categoryComparisonChart;
   let pendingCredential;
   let allTransactions = [];
-  let userBudgets = {}; // NOVO
-  let unsubscribeFromExpenses;
-  let unsubscribeFromIncomes;
-  let unsubscribeFromBudgets; // NOVO
+  let userBudgets = {}; 
+  let unsubscribeFromExpenses, unsubscribeFromIncomes, unsubscribeFromBudgets;
 
-  // --- Lógica de Autenticação (sem grandes alterações) --- //
-  showRegisterLink.addEventListener("click", (e) => {
-    e.preventDefault();
-    loginView.style.display = "none";
-    registerView.style.display = "block";
-  });
-
-  showLoginLink.addEventListener("click", (e) => {
-    e.preventDefault();
-    registerView.style.display = "none";
-    loginView.style.display = "block";
-  });
+  // --- Funções de Autenticação --- //
+  showRegisterLink.addEventListener("click", (e) => { e.preventDefault(); loginView.style.display = "none"; registerView.style.display = "block"; });
+  showLoginLink.addEventListener("click", (e) => { e.preventDefault(); registerView.style.display = "none"; loginView.style.display = "block"; });
   
   function handleProviderLogin(provider) {
     auth.signInWithPopup(provider).catch((error) => {
@@ -96,25 +97,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   googleLoginBtn.addEventListener("click", () => handleProviderLogin(new firebase.auth.GoogleAuthProvider()));
   githubLoginBtn.addEventListener("click", () => handleProviderLogin(new firebase.auth.GithubAuthProvider()));
-
   loginEmailBtn.addEventListener("click", () => {
     const email = loginEmailInput.value;
     const password = loginPasswordInput.value;
     if (!email || !password) return alert("Por favor, preencha e-mail e senha.");
-    auth.signInWithEmailAndPassword(email, password).catch((error) => {
-      alert(`Erro ao fazer login: ${error.message}`);
-    });
+    auth.signInWithEmailAndPassword(email, password).catch(error => alert(`Erro ao fazer login: ${error.message}`));
   });
-
   registerBtn.addEventListener("click", () => {
     const email = registerEmailInput.value;
     const password = registerPasswordInput.value;
     if (!email || !password) return alert("Por favor, preencha e-mail e senha.");
-    auth.createUserWithEmailAndPassword(email, password).catch((error) => {
-      alert(`Erro ao registrar: ${error.message}`);
-    });
+    auth.createUserWithEmailAndPassword(email, password).catch(error => alert(`Erro ao registrar: ${error.message}`));
   });
-  
   logoutBtn.addEventListener("click", () => auth.signOut());
 
   auth.onAuthStateChanged((user) => {
@@ -129,12 +123,12 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
       setupUIForLoggedInUser(user);
-      loadUserData(user.uid); // Função unificada
+      loadUserData(user.uid); 
     } else {
       setupUIForLoggedOutUser();
     }
   });
-
+  
   // --- Funções de UI --- //
   function setupUIForLoggedInUser(user) {
     authContainer.style.display = "none";
@@ -148,29 +142,41 @@ document.addEventListener("DOMContentLoaded", () => {
     authContainer.style.display = "block";
     appContent.style.display = "none";
     userInfo.style.display = "none";
-    // Limpa listeners e dados
+   
     if (unsubscribeFromExpenses) unsubscribeFromExpenses();
     if (unsubscribeFromIncomes) unsubscribeFromIncomes();
-    if (unsubscribeFromBudgets) unsubscribeFromBudgets(); // NOVO
+    if (unsubscribeFromBudgets) unsubscribeFromBudgets(); 
     allTransactions = [];
-    userBudgets = {}; // NOVO
+    userBudgets = {};
     renderAll();
   }
 
-  // Lógica das Abas
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
       tabs.forEach(item => item.classList.remove('active'));
       formContainers.forEach(container => container.classList.remove('active'));
-      
       tab.classList.add('active');
       document.getElementById(tab.dataset.tab).classList.add('active');
     });
   });
 
-  // --- Funções do Firestore --- //
+  showMainViewBtn.addEventListener('click', () => {
+      mainView.style.display = 'block';
+      reportsView.style.display = 'none';
+      showMainViewBtn.classList.add('active');
+      showReportsViewBtn.classList.remove('active');
+  });
+
+  showReportsViewBtn.addEventListener('click', () => {
+      mainView.style.display = 'none';
+      reportsView.style.display = 'block';
+      showMainViewBtn.classList.remove('active');
+      showReportsViewBtn.classList.add('active');
+      renderReports();
+  });
+
+  // --- Funções de Dados (Firebase) --- //
   function loadUserData(userId) {
-    // Carrega Transações
     const expensesQuery = db.collection("users").doc(userId).collection("gastos").orderBy("createdAt", "desc");
     const incomesQuery = db.collection("users").doc(userId).collection("receitas").orderBy("createdAt", "desc");
 
@@ -178,22 +184,25 @@ document.addEventListener("DOMContentLoaded", () => {
         const expenses = snapshot.docs.map(doc => ({ id: doc.id, type: 'expense', ...doc.data() }));
         updateTransactions('expense', expenses);
     });
-
     unsubscribeFromIncomes = incomesQuery.onSnapshot(snapshot => {
         const incomes = snapshot.docs.map(doc => ({ id: doc.id, type: 'income', ...doc.data() }));
         updateTransactions('income', incomes);
     });
-
-    // Carrega Orçamentos (NOVO)
+  
     const budgetDocRef = db.collection("users").doc(userId).collection("orcamentos").doc("mensal");
     unsubscribeFromBudgets = budgetDocRef.onSnapshot(doc => {
         userBudgets = doc.exists ? doc.data() : {};
-        renderAll(); // Re-renderiza tudo para atualizar o progresso dos orçamentos
+        renderAll(); 
     });
   }
 
   function updateTransactions(type, data) {
     allTransactions = allTransactions.filter(t => t.type !== type).concat(data);
+    allTransactions.sort((a, b) => {
+        const dateA = a.createdAt ? a.createdAt.toDate() : new Date();
+        const dateB = b.createdAt ? b.createdAt.toDate() : new Date();
+        return dateB - dateA;
+    });
     renderAll();
   }
   
@@ -201,13 +210,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const collectionName = type === 'expense' ? 'gastos' : 'receitas';
     try {
       await db.collection("users").doc(userId).collection(collectionName).add({
-        ...data,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        ownerId: userId,
+        ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp(), ownerId: userId,
       });
     } catch (error) {
-      console.error(`Erro ao adicionar ${type}: `, error);
-      alert(`Não foi possível salvar a transação.`);
+      console.error(`Erro ao adicionar ${type}: `, error); alert(`Não foi possível salvar a transação.`);
     }
   }
 
@@ -219,96 +225,88 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         await db.collection("users").doc(user.uid).collection(collectionName).doc(id).delete();
       } catch (error) {
-        console.error(`Erro ao excluir ${type}: `, error);
-        alert("Não foi possível excluir a transação.");
+        console.error(`Erro ao excluir ${type}: `, error); alert("Não foi possível excluir a transação.");
       }
     }
   }
-
-  // NOVO: Função para salvar orçamentos
+ 
   async function saveUserBudgets() {
-    const user = auth.currentUser;
-    if (!user) return;
-
+    const user = auth.currentUser; if (!user) return;
     const budgetInputs = document.querySelectorAll('.budget-input');
     const newBudgets = {};
     budgetInputs.forEach(input => {
       const category = input.dataset.category;
       const amount = parseFloat(input.value);
-      if (category && !isNaN(amount) && amount >= 0) {
-        newBudgets[category] = amount;
-      }
+      if (category && !isNaN(amount) && amount >= 0) newBudgets[category] = amount;
     });
-
     try {
       await db.collection("users").doc(user.uid).collection("orcamentos").doc("mensal").set(newBudgets, { merge: true });
       alert("Orçamentos salvos com sucesso!");
     } catch (error) {
-      console.error("Erro ao salvar orçamentos: ", error);
-      alert("Não foi possível salvar os orçamentos.");
+      console.error("Erro ao salvar orçamentos: ", error); alert("Não foi possível salvar os orçamentos.");
     }
   }
 
-  // --- Lógica de Renderização e Cálculos --- //
+  // --- Funções de Renderização --- //
   function renderAll() {
-    allTransactions.sort((a, b) => {
-        const dateA = a.createdAt ? a.createdAt.toDate() : new Date();
-        const dateB = b.createdAt ? b.createdAt.toDate() : new Date();
-        return dateB - dateA;
-    });
+    const filteredTransactions = getFilteredTransactions();
 
     transactionList.innerHTML = "";
-    allTransactions.forEach(t => {
-      const amount = parseFloat(t.amount).toFixed(2);
-      const sign = t.type === 'expense' ? '-' : '+';
-      const listItem = document.createElement("li");
-      listItem.className = `transaction-item ${t.type}`;
-      listItem.innerHTML = `
-        <div class="transaction-info">
-            <span class="description">${t.description}</span>
-            <span class="category">${t.category}</span>
-        </div>
-        <div class="amount">${sign} R$ ${amount}</div>
-        <button class="delete-btn" data-id="${t.id}" data-type="${t.type}">Excluir</button>`;
-      transactionList.appendChild(listItem);
-    });
-
-    calculateAndRenderMetrics();
+    if (filteredTransactions.length === 0) {
+        transactionList.innerHTML = "<p style='text-align:center; color: var(--cor-texto-suave);'>Nenhuma transação encontrada para este período.</p>";
+    } else {
+        filteredTransactions.forEach(t => {
+          const amount = parseFloat(t.amount).toFixed(2);
+          const sign = t.type === 'expense' ? '-' : '+';
+          const listItem = document.createElement("li");
+          listItem.className = `transaction-item ${t.type}`;
+          listItem.innerHTML = `
+            <div class="transaction-info">
+                <span class="description">${t.description}</span>
+                <span class="category">${t.category}</span>
+            </div>
+            <div class="amount">${sign} R$ ${amount}</div>
+            <button class="delete-btn" data-id="${t.id}" data-type="${t.type}">Excluir</button>`;
+          transactionList.appendChild(listItem);
+        });
+    }
+    calculateAndRenderMetrics(filteredTransactions);
   }
 
-  function calculateAndRenderMetrics() {
-    const hoje = new Date();
-    const inicioDoMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
-
-    let monthlyExpenses = 0;
-    let monthlyIncome = 0;
+  function calculateAndRenderMetrics(transactions) {
+    let totalIncome = 0;
+    let totalExpenses = 0;
     const expenseCategoryTotals = {};
     
-    allTransactions.forEach(t => {
-        const transactionDate = t.createdAt ? t.createdAt.toDate() : null;
-        if (transactionDate && transactionDate >= inicioDoMes) {
-            if (t.type === 'expense') {
-                monthlyExpenses += parseFloat(t.amount);
-                expenseCategoryTotals[t.category] = (expenseCategoryTotals[t.category] || 0) + parseFloat(t.amount);
-            } else if (t.type === 'income') {
-                monthlyIncome += parseFloat(t.amount);
-            }
+    transactions.forEach(t => {
+        if (t.type === 'expense') {
+            totalExpenses += parseFloat(t.amount);
+            expenseCategoryTotals[t.category] = (expenseCategoryTotals[t.category] || 0) + parseFloat(t.amount);
+        } else if (t.type === 'income') {
+            totalIncome += parseFloat(t.amount);
         }
     });
 
-    const monthlyBalance = monthlyIncome - monthlyExpenses;
+    const totalBalance = totalIncome - totalExpenses;
     
-    monthlyIncomeSpan.textContent = `R$ ${monthlyIncome.toFixed(2)}`;
-    monthlyExpensesSpan.textContent = `R$ ${monthlyExpenses.toFixed(2)}`;
-    monthlyBalanceSpan.textContent = `R$ ${monthlyBalance.toFixed(2)}`;
+    monthlyIncomeSpan.textContent = `R$ ${totalIncome.toFixed(2)}`;
+    monthlyExpensesSpan.textContent = `R$ ${totalExpenses.toFixed(2)}`;
+    monthlyBalanceSpan.textContent = `R$ ${totalBalance.toFixed(2)}`;
+    monthlyBalanceSpan.className = totalBalance >= 0 ? 'positive' : 'negative';
     
-    monthlyBalanceSpan.className = monthlyBalance >= 0 ? 'positive' : 'negative';
-    
-    renderOrUpdateChart(expenseCategoryTotals);
-    renderBudgetProgress(expenseCategoryTotals); // NOVO
+    renderOrUpdateDoughnutChart(expenseCategoryTotals);
+
+    // O progresso do orçamento é sempre calculado com base nos gastos do mês atual
+    const hoje = new Date();
+    const inicioDoMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+    const expensesThisMonth = allTransactions.filter(t => t.type === 'expense' && t.createdAt && t.createdAt.toDate() >= inicioDoMes);
+    const spentByCategoryThisMonth = {};
+    expensesThisMonth.forEach(t => {
+        spentByCategoryThisMonth[t.category] = (spentByCategoryThisMonth[t.category] || 0) + parseFloat(t.amount);
+    });
+    renderBudgetProgress(spentByCategoryThisMonth);
   }
 
-  // NOVO: Função para renderizar a seção de orçamentos
   function renderBudgetProgress(spentByCategory) {
     budgetSection.innerHTML = '';
     const categories = [...expenseCategoryInput.options].map(opt => opt.value).filter(val => val);
@@ -316,11 +314,7 @@ document.addEventListener("DOMContentLoaded", () => {
     categories.forEach(category => {
       const budgetAmount = userBudgets[category] || 0;
       const spentAmount = spentByCategory[category] || 0;
-      let progressPercent = 0;
-      if (budgetAmount > 0) {
-          progressPercent = (spentAmount / budgetAmount) * 100;
-      }
-
+      let progressPercent = budgetAmount > 0 ? (spentAmount / budgetAmount) * 100 : 0;
       const isOverBudget = spentAmount > budgetAmount && budgetAmount > 0;
 
       const item = document.createElement('div');
@@ -337,12 +331,61 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
         <div class="budget-input-group">
           <input type="number" step="0.01" class="budget-input" data-category="${category}" value="${budgetAmount > 0 ? budgetAmount.toFixed(2) : ''}" placeholder="Definir Orçamento">
-        </div>
-      `;
+        </div>`;
       budgetSection.appendChild(item);
     });
   }
 
+  // --- Funções de Filtros --- //
+  periodFilter.addEventListener("change", () => {
+    if (periodFilter.value === "custom") {
+      customDateRange.style.display = "flex";
+    } else {
+      customDateRange.style.display = "none";
+    }
+    renderAll();
+  });
+  startDateInput.addEventListener("change", renderAll);
+  endDateInput.addEventListener("change", renderAll);
+
+  function getFilteredTransactions() {
+    const now = new Date();
+    let startDate, endDate = new Date(now);
+
+    switch (periodFilter.value) {
+      case "this-month":
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        endDate.setHours(23, 59, 59, 999);
+        break;
+      case "last-7-days":
+        startDate = new Date(now);
+        startDate.setDate(now.getDate() - 7);
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+        break;
+      case "last-month":
+        startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        endDate = new Date(now.getFullYear(), now.getMonth(), 0);
+        endDate.setHours(23, 59, 59, 999);
+        break;
+      case "custom":
+        startDate = startDateInput.value ? new Date(startDateInput.value + 'T00:00:00') : null;
+        endDate = endDateInput.value ? new Date(endDateInput.value + 'T23:59:59') : null;
+        break;
+      case "all-time":
+      default:
+        return allTransactions;
+    }
+
+    if (!startDate || !endDate) return allTransactions;
+
+    return allTransactions.filter(t => {
+      const transactionDate = t.createdAt ? t.createdAt.toDate() : null;
+      return transactionDate && transactionDate >= startDate && transactionDate <= endDate;
+    });
+  }
+  
+  // --- Funções de Gráficos --- //
   const centerTextPlugin = {
     id: 'centerText',
     afterDraw: (chart) => {
@@ -351,73 +394,131 @@ document.addEventListener("DOMContentLoaded", () => {
       const { width, height } = chart.chartArea;
       const centerX = chart.chartArea.left + width / 2;
       const centerY = chart.chartArea.top + height / 2;
-      ctx.font = 'bold 20px Inter';
-      ctx.fillStyle = '#1E293B';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
+      ctx.font = 'bold 20px Inter'; ctx.fillStyle = '#1E293B';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       const total = chart.data.datasets[0].data.reduce((sum, value) => sum + value, 0);
       ctx.fillText(`R$ ${total.toFixed(2)}`, centerX, centerY);
     }
   };
 
-  function renderOrUpdateChart(categoryData) {
+  function renderOrUpdateDoughnutChart(categoryData) {
     if (expenseChart) expenseChart.destroy();
-    
     expenseChart = new Chart(chartCanvas, {
       type: 'doughnut', 
       data: {
         labels: Object.keys(categoryData),
         datasets: [{
-          label: "Gastos por Categoria",
-          data: Object.values(categoryData),
+          label: "Gastos por Categoria", data: Object.values(categoryData),
           backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"],
           borderWidth: 0, 
         }],
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '70%', 
-        plugins: {
-          legend: { position: 'bottom' },
-        },
+        responsive: true, maintainAspectRatio: false, cutout: '70%', 
+        plugins: { legend: { position: 'bottom' } },
       },
       plugins: [centerTextPlugin]
     });
   }
 
-  // --- Event Listeners dos Formulários --- //
-  expenseForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const user = auth.currentUser;
-    if (!user) return;
+  function renderReports() {
+    renderMonthlyEvolutionChart();
+    renderCategoryComparisonChart();
+  }
+
+  function renderMonthlyEvolutionChart() {
     const data = {
-        description: expenseDescriptionInput.value,
-        category: expenseCategoryInput.value,
-        amount: parseFloat(expenseAmountInput.value)
+        labels: [],
+        datasets: [
+            { label: 'Receitas', data: [], backgroundColor: 'rgba(16, 185, 129, 0.7)', borderColor: '#10B981', borderWidth: 2, borderRadius: 5 },
+            { label: 'Despesas', data: [], backgroundColor: 'rgba(239, 68, 68, 0.7)', borderColor: '#EF4444', borderWidth: 2, borderRadius: 5 }
+        ]
     };
+    const monthlyTotals = {};
+    for (let i = 5; i >= 0; i--) {
+        const d = new Date();
+        d.setMonth(d.getMonth() - i);
+        const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const monthName = d.toLocaleString('default', { month: 'short' });
+        data.labels.push(monthName);
+        monthlyTotals[monthKey] = { income: 0, expense: 0 };
+    }
+
+    allTransactions.forEach(t => {
+        if (t.createdAt) {
+            const date = t.createdAt.toDate();
+            const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+            if (monthlyTotals[monthKey]) {
+                monthlyTotals[monthKey][t.type] += parseFloat(t.amount);
+            }
+        }
+    });
+
+    for (const key in monthlyTotals) {
+        data.datasets[0].data.push(monthlyTotals[key].income);
+        data.datasets[1].data.push(monthlyTotals[key].expense);
+    }
+
+    if(monthlyEvolutionChart) monthlyEvolutionChart.destroy();
+    monthlyEvolutionChart = new Chart(monthlyEvolutionChartCanvas, {
+        type: 'bar', data,
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true, ticks: { callback: value => `R$ ${value}` } } }
+        }
+    });
+  }
+
+  function renderCategoryComparisonChart() {
+    const expenseCategoryTotals = {};
+    allTransactions.forEach(t => {
+        if (t.type === 'expense') {
+            expenseCategoryTotals[t.category] = (expenseCategoryTotals[t.category] || 0) + parseFloat(t.amount);
+        }
+    });
+
+    const sortedCategories = Object.entries(expenseCategoryTotals).sort((a, b) => b[1] - a[1]);
+    
+    const data = {
+        labels: sortedCategories.map(item => item[0]),
+        datasets: [{
+            label: 'Total Gasto',
+            data: sortedCategories.map(item => item[1]),
+            backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"],
+        }]
+    };
+    
+    if(categoryComparisonChart) categoryComparisonChart.destroy();
+    categoryComparisonChart = new Chart(categoryComparisonChartCanvas, {
+        type: 'bar', data,
+        options: {
+            indexAxis: 'y', // Gráfico de barras horizontais para melhor leitura
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { x: { ticks: { callback: value => `R$ ${value}` } } }
+        }
+    });
+  }
+
+
+  // --- Event Listeners dos Formulários e Ações --- //
+  expenseForm.addEventListener("submit", (event) => {
+    event.preventDefault(); const user = auth.currentUser; if (!user) return;
+    const data = { description: expenseDescriptionInput.value, category: expenseCategoryInput.value, amount: parseFloat(expenseAmountInput.value) };
     if (data.description.trim() && data.category && !isNaN(data.amount) && data.amount > 0) {
       addTransactionToDB('expense', data, user.uid);
-      expenseForm.reset();
-      expenseDescriptionInput.focus();
+      expenseForm.reset(); expenseDescriptionInput.focus();
     } else {
       alert("Por favor, preencha todos os campos do gasto com valores válidos.");
     }
   });
 
   incomeForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const user = auth.currentUser;
-    if (!user) return;
-    const data = {
-        description: incomeDescriptionInput.value,
-        category: incomeCategoryInput.value,
-        amount: parseFloat(incomeAmountInput.value)
-    };
+    event.preventDefault(); const user = auth.currentUser; if (!user) return;
+    const data = { description: incomeDescriptionInput.value, category: incomeCategoryInput.value, amount: parseFloat(incomeAmountInput.value) };
     if (data.description.trim() && data.category && !isNaN(data.amount) && data.amount > 0) {
       addTransactionToDB('income', data, user.uid);
-      incomeForm.reset();
-      incomeDescriptionInput.focus();
+      incomeForm.reset(); incomeDescriptionInput.focus();
     } else {
       alert("Por favor, preencha todos os campos da receita com valores válidos.");
     }
@@ -430,7 +531,6 @@ document.addEventListener("DOMContentLoaded", () => {
       deleteTransactionFromDB(id, type);
     }
   });
-
-  // NOVO: Event Listener para o botão de salvar orçamentos
+ 
   saveBudgetsBtn.addEventListener('click', saveUserBudgets);
 });
