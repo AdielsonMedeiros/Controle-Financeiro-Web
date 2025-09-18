@@ -1,6 +1,4 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
-
 
 :root {
     --cor-primaria: #4F46E5;
@@ -11,7 +9,9 @@
     --cor-texto-suave: #64748B;
     --cor-borda: #E2E8F0;
     --cor-sucesso: #10B981;
+    --cor-sucesso-fundo: #E6F8F3;
     --cor-erro: #EF4444;
+    --cor-erro-fundo: #FDECEC;
     --sombra-card: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
@@ -24,7 +24,6 @@
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--cor-fundo);
-   
     background-image: linear-gradient(170deg, #f0f4ff 0%, #f8fafc 100%);
     color: var(--cor-texto);
     display: flex;
@@ -70,7 +69,6 @@ label {
     color: var(--cor-texto-suave);
 }
 
-
 input[type="text"],
 input[type="number"],
 input[type="password"],
@@ -84,14 +82,12 @@ select {
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-
 input:focus,
 select:focus {
     outline: none;
     border-color: var(--cor-primaria);
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
 }
-
 
 button {
     width: 100%;
@@ -111,7 +107,6 @@ button:hover {
     transform: translateY(-2px);
 }
 
-
 #register-btn {
   background-color: var(--cor-sucesso);
 }
@@ -119,13 +114,61 @@ button:hover {
   background-color: #059669;
 }
 
+/* --- ESTILOS NOVOS E ATUALIZADOS --- */
 
-#expense-list {
+.tabs {
+    display: flex;
+    margin-bottom: 25px;
+    background-color: var(--cor-fundo);
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px;
+    background-color: transparent;
+    color: var(--cor-texto-suave);
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 15px;
+}
+
+.tab-btn.active {
+    background-color: var(--cor-container);
+    color: var(--cor-primaria);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+}
+
+.tab-btn:not(.active):hover {
+    background-color: #eef2ff;
+    transform: none;
+}
+
+.form-container {
+    display: none;
+}
+
+.form-container.active {
+    display: block;
+}
+
+#income-form button {
+    background-color: var(--cor-sucesso);
+}
+#income-form button:hover {
+    background-color: #059669;
+}
+
+#transaction-list {
     list-style-type: none;
     padding: 0;
 }
 
-#expense-list li {
+.transaction-item {
     background-color: transparent;
     padding: 15px 0;
     border-bottom: 1px solid var(--cor-borda);
@@ -135,31 +178,75 @@ button:hover {
     font-size: 16px;
     transition: background-color 0.2s ease;
 }
-#expense-list li:last-child {
+.transaction-item:last-child {
     border-bottom: none;
 }
-#expense-list li:hover {
+.transaction-item:hover {
     background-color: #f9fafb;
 }
 
-#expense-list li .expense-info {
+.transaction-info {
     display: flex;
     flex-direction: column;
     gap: 4px;
     flex-grow: 1;
 }
 
-#expense-list li .expense-info span:first-child em {
+.transaction-info .description {
+    font-weight: 500;
+    color: var(--cor-texto);
+}
+
+.transaction-info .category {
     font-size: 13px;
     color: var(--cor-texto-suave);
     font-style: normal;
 }
 
-#expense-list li .expense-info span:last-child {
-    font-weight: 500;
-    color: var(--cor-texto);
-    margin-top: 0;
+.transaction-item .amount {
+    font-weight: 700;
 }
+
+.transaction-item.income .amount {
+    color: var(--cor-sucesso);
+}
+
+.transaction-item.expense .amount {
+    color: var(--cor-erro);
+}
+
+.summary-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    text-align: center;
+}
+
+.summary-item {
+    background-color: var(--cor-fundo);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid var(--cor-borda);
+}
+
+.summary-item span {
+    display: block;
+    font-size: 14px;
+    color: var(--cor-texto-suave);
+    margin-bottom: 8px;
+}
+
+.summary-item strong {
+    font-size: 18px;
+    font-weight: 700;
+}
+.summary-item.income strong { color: var(--cor-sucesso); }
+.summary-item.expense strong { color: var(--cor-erro); }
+.summary-item.balance strong.positive { color: var(--cor-sucesso); }
+.summary-item.balance strong.negative { color: var(--cor-erro); }
+
+
+/* --- FIM DOS ESTILOS NOVOS --- */
 
 .delete-btn {
     width: auto;
@@ -178,27 +265,11 @@ button:hover {
     transform: none;
 }
 
-.total, .metrics {
-    text-align: right;
-    margin-top: 25px;
-    font-size: 16px;
-    line-height: 1.6;
-}
-
-.total h3 { text-align: right; }
-
-#total-amount {
-    font-weight: 700;
-    color: var(--cor-primaria);
-    font-size: 22px;
-}
-
 .chart-container {
     width: 100%;
     max-width: 400px;
     margin: 30px auto;
 }
-
 
 .auth-title {
   text-align: center;
@@ -222,7 +293,6 @@ button:hover {
 .toggle-auth a:hover {
   text-decoration: underline;
 }
-
 
 .social-login-section {
     margin: 25px 0;
@@ -267,8 +337,6 @@ button:hover {
     height: auto;
 }
 
-
-
 #user-info {
     display: flex;
     align-items: center;
@@ -309,7 +377,6 @@ button:hover {
     color: var(--cor-texto);
 }
 
-
 #logout-btn {
     width: auto;
     padding: 8px 18px;
@@ -330,84 +397,17 @@ button:hover {
     transform: none;
 }
 
-
-
-
 @media (max-width: 768px) {
-    body {
-       
-        padding: 30px 15px;
-    }
-
-    .container {
-       
-        padding: 30px;
-    }
+    body { padding: 30px 15px; }
+    .container { padding: 30px; }
+    .summary-container { grid-template-columns: 1fr; }
 }
 
-
-
 @media (max-width: 576px) {
-    body {
-       
-        padding: 20px 10px;
-    }
-
-    .container {
-       
-        padding: 20px;
-    }
-
-    h1 {
-       
-        font-size: 28px;
-    }
-
-    h2 {
-       
-        font-size: 22px;
-    }
-
-   
-    #user-info {
-        padding: 10px 15px;
-        gap: 10px;
-    }
-
-    #user-avatar {
-        width: 40px;
-        height: 40px;
-    }
-
-    .user-details {
-       
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
-    
-    .user-details p {
-        font-size: 14px;
-    }
-
-    #logout-btn {
-       
-        padding: 6px 12px;
-        font-size: 13px;
-    }
-    
-   
-    .social-icon-btn {
-        width: 45px;
-        height: 45px;
-    }
-    
-   
-    button {
-        padding: 12px;
-    }
-
-    .delete-btn {
-        padding: 6px 10px;
-    }
+    body { padding: 20px 10px; }
+    .container { padding: 20px; }
+    h1 { font-size: 28px; }
+    h2 { font-size: 22px; }
+    .user-details { flex-direction: column; align-items: flex-start; gap: 8px; }
+    #user-avatar { width: 40px; height: 40px; }
 }
