@@ -6,11 +6,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const db = firebase.firestore();
   const auth = firebase.auth();
 
-  // --- Seletores de Elementos --- //
+  // --- Seleção de Elementos DOM --- //
   const authContainer = document.getElementById("auth-container");
   const appContent = document.getElementById("app-content");
 
-  // Autenticação
   const loginView = document.getElementById("login-view");
   const registerView = document.getElementById("register-view");
   const showRegisterLink = document.getElementById("show-register");
@@ -25,12 +24,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const githubLoginBtn = document.getElementById("login-github-icon-btn");
   const logoutBtn = document.getElementById("logout-btn");
 
-  // UI do Usuário
   const userInfo = document.getElementById("user-info");
   const userEmailSpan = document.getElementById("user-email");
   const userAvatar = document.getElementById("user-avatar");
 
-  // Navegação e Abas
   const tabs = document.querySelectorAll(".tab-btn");
   const formContainers = document.querySelectorAll(".form-container");
   const showMainViewBtn = document.getElementById("show-main-view-btn");
@@ -38,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const mainView = document.getElementById("main-view");
   const reportsView = document.getElementById("reports-view");
 
-  // Formulários
   const expenseForm = document.getElementById("expense-form");
   const expenseDescriptionInput = document.getElementById("expense-description");
   const expenseCategoryInput = document.getElementById("expense-category");
@@ -48,27 +44,28 @@ document.addEventListener("DOMContentLoaded", () => {
   const incomeCategoryInput = document.getElementById("income-category");
   const incomeAmountInput = document.getElementById("income-amount");
   
-  // Exibição de Dados
   const transactionList = document.getElementById("transaction-list");
   const monthlyIncomeSpan = document.getElementById("monthly-income");
   const monthlyExpensesSpan = document.getElementById("monthly-expenses");
   const monthlyBalanceSpan = document.getElementById("monthly-balance");
   
-  // Gráficos
   const chartCanvas = document.getElementById("expense-chart").getContext("2d");
   const monthlyEvolutionChartCanvas = document.getElementById("monthly-evolution-chart").getContext("2d");
   const categoryComparisonChartCanvas = document.getElementById("category-comparison-chart").getContext("2d");
 
-  // Orçamentos
   const budgetSection = document.getElementById("budget-section");
   const saveBudgetsBtn = document.getElementById("save-budgets-btn");
 
-  // Filtros
   const periodFilter = document.getElementById("period-filter");
   const customDateRange = document.getElementById("custom-date-range");
   const startDateInput = document.getElementById("start-date");
   const endDateInput = document.getElementById("end-date");
-
+  
+  // Elementos do Tema Escuro
+  const themeToggleBtn = document.getElementById('theme-toggle-btn');
+  const moonIcon = document.getElementById('moon-icon');
+  const sunIcon = document.getElementById('sun-icon');
+  
   // --- Variáveis de Estado --- //
   let expenseChart, monthlyEvolutionChart, categoryComparisonChart;
   let pendingCredential;
@@ -76,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let userBudgets = {}; 
   let unsubscribeFromExpenses, unsubscribeFromIncomes, unsubscribeFromBudgets;
 
-  // --- Funções de Autenticação --- //
+  // --- Lógica de Autenticação --- //
   showRegisterLink.addEventListener("click", (e) => { e.preventDefault(); loginView.style.display = "none"; registerView.style.display = "block"; });
   showLoginLink.addEventListener("click", (e) => { e.preventDefault(); registerView.style.display = "none"; loginView.style.display = "block"; });
   
@@ -142,7 +139,6 @@ document.addEventListener("DOMContentLoaded", () => {
     authContainer.style.display = "block";
     appContent.style.display = "none";
     userInfo.style.display = "none";
-   
     if (unsubscribeFromExpenses) unsubscribeFromExpenses();
     if (unsubscribeFromIncomes) unsubscribeFromIncomes();
     if (unsubscribeFromBudgets) unsubscribeFromBudgets(); 
@@ -175,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
       renderReports();
   });
 
-  // --- Funções de Dados (Firebase) --- //
+  // --- Funções de Dados (Firestore) --- //
   function loadUserData(userId) {
     const expensesQuery = db.collection("users").doc(userId).collection("gastos").orderBy("createdAt", "desc");
     const incomesQuery = db.collection("users").doc(userId).collection("receitas").orderBy("createdAt", "desc");
@@ -296,7 +292,6 @@ document.addEventListener("DOMContentLoaded", () => {
     
     renderOrUpdateDoughnutChart(expenseCategoryTotals);
 
-    // O progresso do orçamento é sempre calculado com base nos gastos do mês atual
     const hoje = new Date();
     const inicioDoMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
     const expensesThisMonth = allTransactions.filter(t => t.type === 'expense' && t.createdAt && t.createdAt.toDate() >= inicioDoMes);
@@ -386,6 +381,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   // --- Funções de Gráficos --- //
+
+  // CORREÇÃO: Plugin do gráfico modificado para usar a cor de texto correta para cada tema.
   const centerTextPlugin = {
     id: 'centerText',
     afterDraw: (chart) => {
@@ -394,15 +391,26 @@ document.addEventListener("DOMContentLoaded", () => {
       const { width, height } = chart.chartArea;
       const centerX = chart.chartArea.left + width / 2;
       const centerY = chart.chartArea.top + height / 2;
-      ctx.font = 'bold 20px Inter'; ctx.fillStyle = '#1E293B';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      
+      // Verifica o tema atual para definir a cor do texto
+      const isDarkMode = document.body.classList.contains('dark-mode');
+      ctx.fillStyle = isDarkMode ? '#F3F4F6' : '#1E293B'; // Usa a cor do tema
+      
+      ctx.font = 'bold 20px Inter';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
       const total = chart.data.datasets[0].data.reduce((sum, value) => sum + value, 0);
       ctx.fillText(`R$ ${total.toFixed(2)}`, centerX, centerY);
     }
   };
 
+  // CORREÇÃO: Função do gráfico modificada para usar a cor de legenda correta.
   function renderOrUpdateDoughnutChart(categoryData) {
     if (expenseChart) expenseChart.destroy();
+    
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    const legendColor = isDarkMode ? '#9CA3AF' : '#64748B';
+
     expenseChart = new Chart(chartCanvas, {
       type: 'doughnut', 
       data: {
@@ -415,7 +423,14 @@ document.addEventListener("DOMContentLoaded", () => {
       },
       options: {
         responsive: true, maintainAspectRatio: false, cutout: '70%', 
-        plugins: { legend: { position: 'bottom' } },
+        plugins: { 
+          legend: { 
+            position: 'bottom',
+            labels: {
+              color: legendColor // Define a cor da legenda
+            }
+          } 
+        },
       },
       plugins: [centerTextPlugin]
     });
@@ -425,8 +440,13 @@ document.addEventListener("DOMContentLoaded", () => {
     renderMonthlyEvolutionChart();
     renderCategoryComparisonChart();
   }
-
+  
+  // CORREÇÃO: Gráficos de relatórios modificados para usar cores de texto e eixos corretas.
   function renderMonthlyEvolutionChart() {
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    const textColor = isDarkMode ? '#9CA3AF' : '#64748B';
+    const gridColor = isDarkMode ? 'rgba(55, 65, 81, 0.5)' : '#E2E8F0';
+
     const data = {
         labels: [],
         datasets: [
@@ -464,12 +484,27 @@ document.addEventListener("DOMContentLoaded", () => {
         type: 'bar', data,
         options: {
             responsive: true, maintainAspectRatio: false,
-            scales: { y: { beginAtZero: true, ticks: { callback: value => `R$ ${value}` } } }
+            plugins: { legend: { labels: { color: textColor } } },
+            scales: { 
+              y: { 
+                beginAtZero: true, 
+                ticks: { callback: value => `R$ ${value}`, color: textColor },
+                grid: { color: gridColor }
+              },
+              x: {
+                ticks: { color: textColor },
+                grid: { color: gridColor }
+              }
+            }
         }
     });
   }
 
   function renderCategoryComparisonChart() {
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    const textColor = isDarkMode ? '#9CA3AF' : '#64748B';
+    const gridColor = isDarkMode ? 'rgba(55, 65, 81, 0.5)' : '#E2E8F0';
+
     const expenseCategoryTotals = {};
     allTransactions.forEach(t => {
         if (t.type === 'expense') {
@@ -492,16 +527,24 @@ document.addEventListener("DOMContentLoaded", () => {
     categoryComparisonChart = new Chart(categoryComparisonChartCanvas, {
         type: 'bar', data,
         options: {
-            indexAxis: 'y', // Gráfico de barras horizontais para melhor leitura
+            indexAxis: 'y',
             responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: false } },
-            scales: { x: { ticks: { callback: value => `R$ ${value}` } } }
+            scales: { 
+              x: { 
+                ticks: { callback: value => `R$ ${value}`, color: textColor },
+                grid: { color: gridColor }
+              },
+              y: {
+                ticks: { color: textColor },
+                grid: { color: gridColor }
+              }
+            }
         }
     });
   }
 
-
-  // --- Event Listeners dos Formulários e Ações --- //
+  // --- Event Listeners de Formulários e Ações --- //
   expenseForm.addEventListener("submit", (event) => {
     event.preventDefault(); const user = auth.currentUser; if (!user) return;
     const data = { description: expenseDescriptionInput.value, category: expenseCategoryInput.value, amount: parseFloat(expenseAmountInput.value) };
@@ -533,4 +576,39 @@ document.addEventListener("DOMContentLoaded", () => {
   });
  
   saveBudgetsBtn.addEventListener('click', saveUserBudgets);
+
+  // --- LÓGICA DO TEMA ESCURO --- //
+  const applyTheme = (theme) => {
+    if (theme === 'dark') {
+      document.body.classList.add('dark-mode');
+      moonIcon.style.display = 'none';
+      sunIcon.style.display = 'block';
+    } else {
+      document.body.classList.remove('dark-mode');
+      moonIcon.style.display = 'block';
+      sunIcon.style.display = 'none';
+    }
+  };
+
+  const toggleTheme = () => {
+    const currentTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+    localStorage.setItem('theme', currentTheme);
+    applyTheme(currentTheme);
+
+    // CORREÇÃO: Redesenha os gráficos para que eles apliquem as novas cores do tema.
+    renderAll();
+    if (reportsView.style.display === 'block') {
+      renderReports();
+    }
+  };
+
+  themeToggleBtn.addEventListener('click', toggleTheme);
+
+  const loadInitialTheme = () => {
+    const savedTheme = localStorage.getItem('theme');
+    const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    applyTheme(savedTheme || preferredTheme);
+  };
+
+  loadInitialTheme();
 });

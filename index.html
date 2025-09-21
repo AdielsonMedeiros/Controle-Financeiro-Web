@@ -33,11 +33,25 @@
           <div class="social-login-section">
             <p class="social-login-title">Ou entre com</p>
             <div class="social-login-container">
-              <button id="login-google-icon-btn" class="social-icon-btn" title="Login com Google">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1024px-Google_%22G%22_logo.svg.png" alt="Google Logo"/>
+              <button
+                id="login-google-icon-btn"
+                class="social-icon-btn"
+                title="Login com Google"
+              >
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1024px-Google_%22G%22_logo.svg.png"
+                  alt="Google Logo"
+                />
               </button>
-              <button id="login-github-icon-btn" class="social-icon-btn" title="Login com GitHub">
-                <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo"/>
+              <button
+                id="login-github-icon-btn"
+                class="social-icon-btn"
+                title="Login com GitHub"
+              >
+                <img
+                  src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                  alt="GitHub Logo"
+                />
               </button>
             </div>
           </div>
@@ -72,150 +86,225 @@
 
       <div id="user-info" style="display: none">
         <div class="user-details">
-            <img id="user-avatar" src="" alt="Avatar do Usuário" />
-            <p>Olá, <span id="user-email"></span>!</p>
+          <img id="user-avatar" src="" alt="Avatar do Usuário" />
+          <p>Olá, <span id="user-email"></span>!</p>
         </div>
+        <button id="theme-toggle-btn" class="theme-btn" title="Alternar tema">
+          <svg
+            id="moon-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <svg
+            id="sun-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="display: none"
+          >
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
         <button id="logout-btn">Sair</button>
       </div>
-      
+
       <div id="app-content" style="display: none">
-        
         <div class="view-navigation">
-            <button id="show-main-view-btn" class="view-tab-btn active">Visão Geral</button>
-            <button id="show-reports-view-btn" class="view-tab-btn">Relatórios</button>
+          <button id="show-main-view-btn" class="view-tab-btn active">
+            Visão Geral
+          </button>
+          <button id="show-reports-view-btn" class="view-tab-btn">
+            Relatórios
+          </button>
         </div>
 
         <div id="main-view">
-            <div class="tabs">
-              <button class="tab-btn active" data-tab="expense-form-container">Adicionar Gasto</button>
-              <button class="tab-btn" data-tab="income-form-container">Adicionar Receita</button>
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="expense-form-container">
+              Adicionar Gasto
+            </button>
+            <button class="tab-btn" data-tab="income-form-container">
+              Adicionar Receita
+            </button>
+          </div>
+
+          <div id="expense-form-container" class="form-container active">
+            <form id="expense-form">
+              <div class="form-group">
+                <label for="expense-description">Descrição do Gasto</label>
+                <input
+                  type="text"
+                  id="expense-description"
+                  placeholder="Ex: Almoço, transporte..."
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="expense-category">Categoria</label>
+                <select id="expense-category" required>
+                  <option value="" disabled selected>
+                    Selecione uma categoria
+                  </option>
+                  <option value="Alimentação">Alimentação</option>
+                  <option value="Transporte">Transporte</option>
+                  <option value="Lazer">Lazer</option>
+                  <option value="Moradia">Moradia</option>
+                  <option value="Saúde">Saúde</option>
+                  <option value="Outros">Outros</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="expense-amount">Valor (R$)</label>
+                <input
+                  type="number"
+                  id="expense-amount"
+                  step="0.01"
+                  placeholder="Ex: 25,50"
+                  required
+                />
+              </div>
+              <button type="submit">Adicionar Gasto</button>
+            </form>
+          </div>
+
+          <div id="income-form-container" class="form-container">
+            <form id="income-form">
+              <div class="form-group">
+                <label for="income-description">Descrição da Receita</label>
+                <input
+                  type="text"
+                  id="income-description"
+                  placeholder="Ex: Salário, Freelance..."
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="income-category">Categoria</label>
+                <select id="income-category" required>
+                  <option value="" disabled selected>
+                    Selecione uma categoria
+                  </option>
+                  <option value="Salário">Salário</option>
+                  <option value="Investimentos">Investimentos</option>
+                  <option value="Freelance">Freelance</option>
+                  <option value="Presente">Presente</option>
+                  <option value="Outros">Outros</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="income-amount">Valor (R$)</label>
+                <input
+                  type="number"
+                  id="income-amount"
+                  step="0.01"
+                  placeholder="Ex: 3000,00"
+                  required
+                />
+              </div>
+              <button type="submit">Adicionar Receita</button>
+            </form>
+          </div>
+
+          <hr />
+
+          <h2>Análise de Despesas</h2>
+          <div class="chart-container">
+            <canvas id="expense-chart"></canvas>
+          </div>
+
+          <hr />
+
+          <div class="filters-container">
+            <h3>Filtrar Período</h3>
+            <div class="filter-options">
+              <select id="period-filter">
+                <option value="this-month" selected>Este Mês</option>
+                <option value="last-7-days">Últimos 7 dias</option>
+                <option value="last-month">Mês Passado</option>
+                <option value="all-time">Todo o Período</option>
+                <option value="custom">Personalizado</option>
+              </select>
+              <div id="custom-date-range" style="display: none">
+                <input type="date" id="start-date" />
+                <span>até</span>
+                <input type="date" id="end-date" />
+              </div>
             </div>
+          </div>
 
-            <div id="expense-form-container" class="form-container active">
-                <form id="expense-form">
-                    <div class="form-group">
-                        <label for="expense-description">Descrição do Gasto</label>
-                        <input type="text" id="expense-description" placeholder="Ex: Almoço, transporte..." required />
-                    </div>
-                    <div class="form-group">
-                        <label for="expense-category">Categoria</label>
-                        <select id="expense-category" required>
-                            <option value="" disabled selected>Selecione uma categoria</option>
-                            <option value="Alimentação">Alimentação</option>
-                            <option value="Transporte">Transporte</option>
-                            <option value="Lazer">Lazer</option>
-                            <option value="Moradia">Moradia</option>
-                            <option value="Saúde">Saúde</option>
-                            <option value="Outros">Outros</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="expense-amount">Valor (R$)</label>
-                        <input type="number" id="expense-amount" step="0.01" placeholder="Ex: 25,50" required />
-                    </div>
-                    <button type="submit">Adicionar Gasto</button>
-                </form>
+          <h2>Resumo do Período</h2>
+          <div class="summary-container">
+            <div class="summary-item income">
+              <span>Receitas</span>
+              <strong id="monthly-income">R$ 0.00</strong>
             </div>
-            
-            <div id="income-form-container" class="form-container">
-                <form id="income-form">
-                    <div class="form-group">
-                        <label for="income-description">Descrição da Receita</label>
-                        <input type="text" id="income-description" placeholder="Ex: Salário, Freelance..." required />
-                    </div>
-                     <div class="form-group">
-                        <label for="income-category">Categoria</label>
-                        <select id="income-category" required>
-                            <option value="" disabled selected>Selecione uma categoria</option>
-                            <option value="Salário">Salário</option>
-                            <option value="Investimentos">Investimentos</option>
-                            <option value="Freelance">Freelance</option>
-                            <option value="Presente">Presente</option>
-                            <option value="Outros">Outros</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="income-amount">Valor (R$)</label>
-                        <input type="number" id="income-amount" step="0.01" placeholder="Ex: 3000,00" required />
-                    </div>
-                    <button type="submit">Adicionar Receita</button>
-                </form>
+            <div class="summary-item expense">
+              <span>Despesas</span>
+              <strong id="monthly-expenses">R$ 0.00</strong>
             </div>
-
-            <hr />
-
-            <h2>Análise de Despesas</h2>
-            <div class="chart-container">
-              <canvas id="expense-chart"></canvas>
+            <div class="summary-item balance">
+              <span>Saldo</span>
+              <strong id="monthly-balance">R$ 0.00</strong>
             </div>
+          </div>
 
-            <hr />
-            
-            <div class="filters-container">
-                <h3>Filtrar Período</h3>
-                <div class="filter-options">
-                    <select id="period-filter">
-                        <option value="this-month" selected>Este Mês</option>
-                        <option value="last-7-days">Últimos 7 dias</option>
-                        <option value="last-month">Mês Passado</option>
-                        <option value="all-time">Todo o Período</option>
-                        <option value="custom">Personalizado</option>
-                    </select>
-                    <div id="custom-date-range" style="display: none;">
-                        <input type="date" id="start-date">
-                        <span>até</span>
-                        <input type="date" id="end-date">
-                    </div>
-                </div>
-            </div>
+          <hr />
 
-            <h2>Resumo do Período</h2>
-            <div class="summary-container">
-                <div class="summary-item income">
-                    <span>Receitas</span>
-                    <strong id="monthly-income">R$ 0.00</strong>
-                </div>
-                 <div class="summary-item expense">
-                    <span>Despesas</span>
-                    <strong id="monthly-expenses">R$ 0.00</strong>
-                </div>
-                <div class="summary-item balance">
-                    <span>Saldo</span>
-                    <strong id="monthly-balance">R$ 0.00</strong>
-                </div>
-            </div>
+          <h2>Metas e Orçamentos (Este Mês)</h2>
+          <div id="budget-section"></div>
+          <button id="save-budgets-btn">Salvar Orçamentos</button>
+          <hr />
 
-            <hr />
-
-            <h2>Metas e Orçamentos (Este Mês)</h2>
-            <div id="budget-section">
-            </div>
-            <button id="save-budgets-btn">Salvar Orçamentos</button>
-            <hr />
-
-            <h2>Histórico de Transações</h2>
-            <ul id="transaction-list"></ul>
+          <h2>Histórico de Transações</h2>
+          <ul id="transaction-list"></ul>
         </div>
 
-        <div id="reports-view" style="display: none;">
-            <h2>Relatórios</h2>
-            <div class="report-item">
-                <h3>Evolução de Gastos e Receitas</h3>
-                <p>Veja a comparação de suas receitas e despesas ao longo dos últimos meses.</p>
-                <div class="chart-container" style="height: 400px;">
-                    <canvas id="monthly-evolution-chart"></canvas>
-                </div>
+        <div id="reports-view" style="display: none">
+          <h2>Relatórios</h2>
+          <div class="report-item">
+            <h3>Evolução de Gastos e Receitas</h3>
+            <p>
+              Veja a comparação de suas receitas e despesas ao longo dos últimos
+              meses.
+            </p>
+            <div class="chart-container" style="height: 400px">
+              <canvas id="monthly-evolution-chart"></canvas>
             </div>
-            <hr/>
-             <div class="report-item">
-                <h3>Comparação de Categorias (Todo o Período)</h3>
-                <p>Analise quais categorias têm o maior impacto em suas finanças.</p>
-                <div class="chart-container" style="height: 400px;">
-                    <canvas id="category-comparison-chart"></canvas>
-                </div>
+          </div>
+          <hr />
+          <div class="report-item">
+            <h3>Comparação de Categorias (Todo o Período)</h3>
+            <p>
+              Analise quais categorias têm o maior impacto em suas finanças.
+            </p>
+            <div class="chart-container" style="height: 400px">
+              <canvas id="category-comparison-chart"></canvas>
             </div>
+          </div>
         </div>
-
       </div>
     </div>
 
