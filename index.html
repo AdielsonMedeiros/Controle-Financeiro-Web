@@ -153,6 +153,7 @@
 
           <div id="expense-form-container" class="form-container active">
             <form id="expense-form">
+              <input type="hidden" id="expense-edit-id" />
               <div class="form-group">
                 <label for="expense-description">Descrição do Gasto</label>
                 <input
@@ -186,12 +187,20 @@
                   required
                 />
               </div>
-              <button type="submit">Adicionar Gasto</button>
+              <div class="form-buttons">
+                <button type="submit" id="expense-submit-btn">
+                  Adicionar Gasto
+                </button>
+                <button type="button" class="cancel-edit-btn" id="cancel-expense-edit-btn">
+                  Cancelar
+                </button>
+              </div>
             </form>
           </div>
 
           <div id="income-form-container" class="form-container">
             <form id="income-form">
+              <input type="hidden" id="income-edit-id" />
               <div class="form-group">
                 <label for="income-description">Descrição da Receita</label>
                 <input
@@ -224,7 +233,14 @@
                   required
                 />
               </div>
-              <button type="submit">Adicionar Receita</button>
+              <div class="form-buttons">
+                <button type="submit" id="income-submit-btn">
+                  Adicionar Receita
+                </button>
+                <button type="button" class="cancel-edit-btn" id="cancel-income-edit-btn">
+                  Cancelar
+                </button>
+              </div>
             </form>
           </div>
 

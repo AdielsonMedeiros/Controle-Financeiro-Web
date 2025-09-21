@@ -39,10 +39,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const expenseDescriptionInput = document.getElementById("expense-description");
   const expenseCategoryInput = document.getElementById("expense-category");
   const expenseAmountInput = document.getElementById("expense-amount");
+  const expenseEditIdInput = document.getElementById("expense-edit-id");
+  const expenseSubmitBtn = document.getElementById("expense-submit-btn");
+  const cancelExpenseEditBtn = document.getElementById("cancel-expense-edit-btn");
+
   const incomeForm = document.getElementById("income-form");
   const incomeDescriptionInput = document.getElementById("income-description");
   const incomeCategoryInput = document.getElementById("income-category");
   const incomeAmountInput = document.getElementById("income-amount");
+  const incomeEditIdInput = document.getElementById("income-edit-id");
+  const incomeSubmitBtn = document.getElementById("income-submit-btn");
+  const cancelIncomeEditBtn = document.getElementById("cancel-income-edit-btn");
   
   const transactionList = document.getElementById("transaction-list");
   const monthlyIncomeSpan = document.getElementById("monthly-income");
@@ -61,12 +68,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const startDateInput = document.getElementById("start-date");
   const endDateInput = document.getElementById("end-date");
   
-  // Elementos do Tema Escuro
   const themeToggleBtn = document.getElementById('theme-toggle-btn');
   const moonIcon = document.getElementById('moon-icon');
   const sunIcon = document.getElementById('sun-icon');
   
-  // --- Variáveis de Estado --- //
   let expenseChart, monthlyEvolutionChart, categoryComparisonChart;
   let pendingCredential;
   let allTransactions = [];
@@ -126,7 +131,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
   
-  // --- Funções de UI --- //
   function setupUIForLoggedInUser(user) {
     authContainer.style.display = "none";
     appContent.style.display = "block";
@@ -149,10 +153,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
-      tabs.forEach(item => item.classList.remove('active'));
-      formContainers.forEach(container => container.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById(tab.dataset.tab).classList.add('active');
+        // Apenas alterna se não estiver em modo de edição
+        if (!incomeEditIdInput.value && !expenseEditIdInput.value) {
+            tabs.forEach(item => item.classList.remove('active'));
+            formContainers.forEach(container => container.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById(tab.dataset.tab).classList.add('active');
+        } else {
+            alert("Por favor, finalize a edição atual antes de trocar de aba.");
+        }
     });
   });
 
@@ -170,8 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
       showReportsViewBtn.classList.add('active');
       renderReports();
   });
-
-  // --- Funções de Dados (Firestore) --- //
+  
   function loadUserData(userId) {
     const expensesQuery = db.collection("users").doc(userId).collection("gastos").orderBy("createdAt", "desc");
     const incomesQuery = db.collection("users").doc(userId).collection("receitas").orderBy("createdAt", "desc");
@@ -213,6 +221,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // NOVA FUNÇÃO: Atualiza uma transação existente no DB
+  async function updateTransactionInDB(id, type, data) {
+    const user = auth.currentUser;
+    if (!user) return;
+    const collectionName = type === 'expense' ? 'gastos' : 'receitas';
+    try {
+        await db.collection("users").doc(user.uid).collection(collectionName).doc(id).update(data);
+    } catch (error) {
+        console.error(`Erro ao atualizar ${type}: `, error);
+        alert("Não foi possível salvar as alterações.");
+    }
+  }
+
   async function deleteTransactionFromDB(id, type) {
     const user = auth.currentUser;
     if (!user) return;
@@ -243,10 +264,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- Funções de Renderização --- //
   function renderAll() {
     const filteredTransactions = getFilteredTransactions();
-
     transactionList.innerHTML = "";
     if (filteredTransactions.length === 0) {
         transactionList.innerHTML = "<p style='text-align:center; color: var(--cor-texto-suave);'>Nenhuma transação encontrada para este período.</p>";
@@ -256,19 +275,150 @@ document.addEventListener("DOMContentLoaded", () => {
           const sign = t.type === 'expense' ? '-' : '+';
           const listItem = document.createElement("li");
           listItem.className = `transaction-item ${t.type}`;
+          // ATUALIZAÇÃO: Adicionado botão de editar e um container para as ações
           listItem.innerHTML = `
             <div class="transaction-info">
                 <span class="description">${t.description}</span>
                 <span class="category">${t.category}</span>
             </div>
-            <div class="amount">${sign} R$ ${amount}</div>
-            <button class="delete-btn" data-id="${t.id}" data-type="${t.type}">Excluir</button>`;
+            <div class="amount-container">
+                <div class="amount">${sign} R$ ${amount}</div>
+            </div>
+            <div class="actions">
+                <button class="edit-btn" data-id="${t.id}" data-type="${t.type}">Editar</button>
+                <button class="delete-btn" data-id="${t.id}" data-type="${t.type}">Excluir</button>
+            </div>`;
           transactionList.appendChild(listItem);
         });
     }
     calculateAndRenderMetrics(filteredTransactions);
   }
 
+  // --- LÓGICA DE EDIÇÃO --- //
+
+  // NOVA FUNÇÃO: Prepara o formulário para edição
+  function handleStartEdit(id, type) {
+    const transactionToEdit = allTransactions.find(t => t.id === id);
+    if (!transactionToEdit) return;
+
+    if (type === 'expense') {
+        expenseDescriptionInput.value = transactionToEdit.description;
+        expenseCategoryInput.value = transactionToEdit.category;
+        expenseAmountInput.value = transactionToEdit.amount;
+        expenseEditIdInput.value = id;
+        expenseSubmitBtn.textContent = "Salvar Alterações";
+        document.getElementById('expense-form-container').classList.add('editing');
+        // Ativa a tab correta
+        tabs.forEach(tab => tab.classList.remove('active'));
+        document.querySelector('.tab-btn[data-tab="expense-form-container"]').classList.add('active');
+        formContainers.forEach(c => c.classList.remove('active'));
+        document.getElementById('expense-form-container').classList.add('active');
+
+    } else if (type === 'income') {
+        incomeDescriptionInput.value = transactionToEdit.description;
+        incomeCategoryInput.value = transactionToEdit.category;
+        incomeAmountInput.value = transactionToEdit.amount;
+        incomeEditIdInput.value = id;
+        incomeSubmitBtn.textContent = "Salvar Alterações";
+        document.getElementById('income-form-container').classList.add('editing');
+        // Ativa a tab correta
+        tabs.forEach(tab => tab.classList.remove('active'));
+        document.querySelector('.tab-btn[data-tab="income-form-container"]').classList.add('active');
+        formContainers.forEach(c => c.classList.remove('active'));
+        document.getElementById('income-form-container').classList.add('active');
+    }
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // NOVA FUNÇÃO: Reseta ambos os formulários para o estado inicial
+  function resetForms() {
+      expenseForm.reset();
+      expenseEditIdInput.value = "";
+      expenseSubmitBtn.textContent = "Adicionar Gasto";
+      document.getElementById('expense-form-container').classList.remove('editing');
+
+      incomeForm.reset();
+      incomeEditIdInput.value = "";
+      incomeSubmitBtn.textContent = "Adicionar Receita";
+      document.getElementById('income-form-container').classList.remove('editing');
+  }
+
+  // --- EVENT LISTENERS ATUALIZADOS --- //
+  
+  expenseForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const editId = expenseEditIdInput.value;
+    const data = { 
+        description: expenseDescriptionInput.value, 
+        category: expenseCategoryInput.value, 
+        amount: parseFloat(expenseAmountInput.value) 
+    };
+
+    if (data.description.trim() && data.category && !isNaN(data.amount) && data.amount > 0) {
+      if (editId) {
+        // Modo Edição
+        updateTransactionInDB(editId, 'expense', data);
+      } else {
+        // Modo Adição
+        addTransactionToDB('expense', data, user.uid);
+      }
+      resetForms();
+    } else {
+      alert("Por favor, preencha todos os campos do gasto com valores válidos.");
+    }
+  });
+
+  incomeForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const user = auth.currentUser;
+    if (!user) return;
+    
+    const editId = incomeEditIdInput.value;
+    const data = { 
+        description: incomeDescriptionInput.value, 
+        category: incomeCategoryInput.value, 
+        amount: parseFloat(incomeAmountInput.value)
+    };
+
+    if (data.description.trim() && data.category && !isNaN(data.amount) && data.amount > 0) {
+      if (editId) {
+        // Modo Edição
+        updateTransactionInDB(editId, 'income', data);
+      } else {
+        // Modo Adição
+        addTransactionToDB('income', data, user.uid);
+      }
+      resetForms();
+    } else {
+      alert("Por favor, preencha todos os campos da receita com valores válidos.");
+    }
+  });
+  
+  // Listener ATUALIZADO para a lista de transações (agora ouve por editar e excluir)
+  transactionList.addEventListener("click", (event) => {
+    const target = event.target.closest('button');
+    if (!target) return;
+
+    const id = target.getAttribute("data-id");
+    const type = target.getAttribute("data-type");
+
+    if (target.classList.contains("delete-btn")) {
+      deleteTransactionFromDB(id, type);
+    } else if (target.classList.contains("edit-btn")) {
+      handleStartEdit(id, type);
+    }
+  });
+
+  cancelExpenseEditBtn.addEventListener('click', resetForms);
+  cancelIncomeEditBtn.addEventListener('click', resetForms);
+
+
+  // --- RESTANTE DO CÓDIGO (MÉTRICAS, GRÁFICOS, FILTROS, TEMA) --- //
+  
   function calculateAndRenderMetrics(transactions) {
     let totalIncome = 0;
     let totalExpenses = 0;
@@ -331,7 +481,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Funções de Filtros --- //
   periodFilter.addEventListener("change", () => {
     if (periodFilter.value === "custom") {
       customDateRange.style.display = "flex";
@@ -380,9 +529,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
   
-  // --- Funções de Gráficos --- //
-
-  // CORREÇÃO: Plugin do gráfico modificado para usar a cor de texto correta para cada tema.
   const centerTextPlugin = {
     id: 'centerText',
     afterDraw: (chart) => {
@@ -392,9 +538,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const centerX = chart.chartArea.left + width / 2;
       const centerY = chart.chartArea.top + height / 2;
       
-      // Verifica o tema atual para definir a cor do texto
       const isDarkMode = document.body.classList.contains('dark-mode');
-      ctx.fillStyle = isDarkMode ? '#F3F4F6' : '#1E293B'; // Usa a cor do tema
+      ctx.fillStyle = isDarkMode ? '#F3F4F6' : '#1E293B';
       
       ctx.font = 'bold 20px Inter';
       ctx.textAlign = 'center';
@@ -404,7 +549,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // CORREÇÃO: Função do gráfico modificada para usar a cor de legenda correta.
   function renderOrUpdateDoughnutChart(categoryData) {
     if (expenseChart) expenseChart.destroy();
     
@@ -427,7 +571,7 @@ document.addEventListener("DOMContentLoaded", () => {
           legend: { 
             position: 'bottom',
             labels: {
-              color: legendColor // Define a cor da legenda
+              color: legendColor
             }
           } 
         },
@@ -441,7 +585,6 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCategoryComparisonChart();
   }
   
-  // CORREÇÃO: Gráficos de relatórios modificados para usar cores de texto e eixos corretas.
   function renderMonthlyEvolutionChart() {
     const isDarkMode = document.body.classList.contains('dark-mode');
     const textColor = isDarkMode ? '#9CA3AF' : '#64748B';
@@ -543,41 +686,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
   }
-
-  // --- Event Listeners de Formulários e Ações --- //
-  expenseForm.addEventListener("submit", (event) => {
-    event.preventDefault(); const user = auth.currentUser; if (!user) return;
-    const data = { description: expenseDescriptionInput.value, category: expenseCategoryInput.value, amount: parseFloat(expenseAmountInput.value) };
-    if (data.description.trim() && data.category && !isNaN(data.amount) && data.amount > 0) {
-      addTransactionToDB('expense', data, user.uid);
-      expenseForm.reset(); expenseDescriptionInput.focus();
-    } else {
-      alert("Por favor, preencha todos os campos do gasto com valores válidos.");
-    }
-  });
-
-  incomeForm.addEventListener("submit", (event) => {
-    event.preventDefault(); const user = auth.currentUser; if (!user) return;
-    const data = { description: incomeDescriptionInput.value, category: incomeCategoryInput.value, amount: parseFloat(incomeAmountInput.value) };
-    if (data.description.trim() && data.category && !isNaN(data.amount) && data.amount > 0) {
-      addTransactionToDB('income', data, user.uid);
-      incomeForm.reset(); incomeDescriptionInput.focus();
-    } else {
-      alert("Por favor, preencha todos os campos da receita com valores válidos.");
-    }
-  });
-
-  transactionList.addEventListener("click", (event) => {
-    if (event.target.classList.contains("delete-btn")) {
-      const id = event.target.getAttribute("data-id");
-      const type = event.target.getAttribute("data-type");
-      deleteTransactionFromDB(id, type);
-    }
-  });
  
   saveBudgetsBtn.addEventListener('click', saveUserBudgets);
-
-  // --- LÓGICA DO TEMA ESCURO --- //
+  
   const applyTheme = (theme) => {
     if (theme === 'dark') {
       document.body.classList.add('dark-mode');
@@ -594,8 +705,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const currentTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
     localStorage.setItem('theme', currentTheme);
     applyTheme(currentTheme);
-
-    // CORREÇÃO: Redesenha os gráficos para que eles apliquem as novas cores do tema.
+  
     renderAll();
     if (reportsView.style.display === 'block') {
       renderReports();

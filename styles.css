@@ -124,6 +124,26 @@ button:hover {
     transform: translateY(-2px);
 }
 
+/* --- ESTILOS PARA BOTÕES DE FORMULÁRIO --- */
+.form-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.cancel-edit-btn {
+    display: none; /* Escondido por padrão */
+    background-color: var(--cor-texto-suave);
+}
+.cancel-edit-btn:hover {
+    background-color: var(--cor-texto);
+    transform: translateY(-2px);
+}
+
+.form-container.editing .cancel-edit-btn {
+    display: block; /* Visível em modo de edição */
+}
+
+
 #register-btn {
     background-color: var(--cor-sucesso);
 }
@@ -231,6 +251,11 @@ button:hover {
     flex-shrink: 0;
 }
 
+.transaction-item .actions {
+    display: flex;
+    gap: 8px;
+}
+
 .transaction-item.income .amount {
     color: var(--cor-sucesso);
 }
@@ -282,14 +307,21 @@ button:hover {
     color: var(--cor-erro);
 }
 
-.delete-btn {
+/* --- ESTILOS PARA BOTÕES EDITAR E EXCLUIR --- */
+.edit-btn, .delete-btn {
     width: auto;
     padding: 8px 12px;
     background-color: transparent;
     color: var(--cor-texto-suave);
     font-size: 14px;
-    margin-left: 15px;
     border: 1px solid transparent;
+}
+
+.edit-btn:hover {
+    background-color: #eef2ff;
+    color: var(--cor-primaria);
+    border-color: #c7d2fe;
+    transform: none;
 }
 
 .delete-btn:hover {
@@ -299,13 +331,13 @@ button:hover {
     transform: none;
 }
 
+
 .chart-container {
     width: 100%;
     margin: 0 auto;
     position: relative;
     height: 300px;
 }
-
 
 .auth-title {
     text-align: center;
@@ -373,7 +405,6 @@ button:hover {
     height: auto;
 }
 
-
 #user-info {
     display: flex;
     align-items: center;
@@ -434,7 +465,6 @@ button:hover {
     border-color: var(--cor-erro);
     transform: none;
 }
-
 
 #budget-section {
     display: flex;
@@ -519,7 +549,6 @@ button:hover {
     background-color: #059669;
 }
 
-
 .view-navigation {
     display: flex;
     margin-bottom: 30px;
@@ -591,7 +620,6 @@ button:hover {
     width: 100%;
     text-align: center;
 }
-
 
 .report-item {
     margin-bottom: 40px;
@@ -683,19 +711,18 @@ button:hover {
         padding: 12px 8px;
     }
 
-    .delete-btn {
+    .delete-btn, .edit-btn {
         padding: 10px;
         margin-left: 0;
-        width: 100%;
+        width: calc(50% - 5px);
         margin-top: 10px;
-        background-color: #fef2f2;
-        color: var(--cor-erro);
-        border: 1px solid #fecaca;
+    }
+    .transaction-item .actions {
+        width: 100%;
     }
 }
 
 /* --- ESTILOS PARA O TEMA ESCURO --- */
-
 body.dark-mode {
     --cor-fundo: #111827;
     --cor-container: #1F2937;
@@ -707,8 +734,6 @@ body.dark-mode {
     background-image: linear-gradient(170deg, #1f2937 0%, #111827 100%);
 }
 
-/* CORREÇÃO: Adicionando a regra que faltava para a barra de usuário.
-*/
 body.dark-mode #user-info {
     background-color: var(--cor-fundo);
     border-color: var(--cor-borda);
@@ -757,13 +782,17 @@ body.dark-mode .transaction-item:hover {
     background-color: #111827;
 }
 
+body.dark-mode .edit-btn:hover {
+    background-color: rgba(79, 70, 229, 0.2);
+    border-color: rgba(79, 70, 229, 0.4);
+}
+
 body.dark-mode .delete-btn:hover {
     background-color: rgba(239, 68, 68, 0.2);
     border-color: rgba(239, 68, 68, 0.4);
 }
 
 /* --- ESTILOS PARA O BOTÃO DE TEMA --- */
-
 .theme-btn {
     width: auto;
     padding: 8px;
