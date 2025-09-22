@@ -136,6 +136,9 @@
           <button id="show-main-view-btn" class="view-tab-btn active">
             Visão Geral
           </button>
+          <button id="show-categories-view-btn" class="view-tab-btn">
+            Categorias
+          </button>
           <button id="show-reports-view-btn" class="view-tab-btn">
             Relatórios
           </button>
@@ -169,13 +172,7 @@
                   <option value="" disabled selected>
                     Selecione uma categoria
                   </option>
-                  <option value="Alimentação">Alimentação</option>
-                  <option value="Transporte">Transporte</option>
-                  <option value="Lazer">Lazer</option>
-                  <option value="Moradia">Moradia</option>
-                  <option value="Saúde">Saúde</option>
-                  <option value="Outros">Outros</option>
-                </select>
+                  </select>
               </div>
               <div class="form-group">
                 <label for="expense-amount">Valor (R$)</label>
@@ -216,12 +213,7 @@
                   <option value="" disabled selected>
                     Selecione uma categoria
                   </option>
-                  <option value="Salário">Salário</option>
-                  <option value="Investimentos">Investimentos</option>
-                  <option value="Freelance">Freelance</option>
-                  <option value="Presente">Presente</option>
-                  <option value="Outros">Outros</option>
-                </select>
+                  </select>
               </div>
               <div class="form-group">
                 <label for="income-amount">Valor (R$)</label>
@@ -296,6 +288,29 @@
 
           <h2>Histórico de Transações</h2>
           <ul id="transaction-list"></ul>
+        </div>
+        
+        <div id="categories-view" style="display: none;">
+            <h2>Gerenciar Categorias</h2>
+            <div class="category-manager">
+                <h3>Categorias de Despesa</h3>
+                <div class="add-category-form">
+                    <input type="text" id="new-expense-category-input" placeholder="Nova categoria de despesa">
+                    <button id="add-expense-category-btn">Adicionar</button>
+                </div>
+                <ul id="expense-category-list" class="category-list">
+                    </ul>
+            </div>
+            <hr>
+            <div class="category-manager">
+                <h3>Categorias de Receita</h3>
+                <div class="add-category-form">
+                    <input type="text" id="new-income-category-input" placeholder="Nova categoria de receita">
+                    <button id="add-income-category-btn">Adicionar</button>
+                </div>
+                <ul id="income-category-list" class="category-list">
+                    </ul>
+            </div>
         </div>
 
         <div id="reports-view" style="display: none">

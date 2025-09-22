@@ -30,9 +30,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const tabs = document.querySelectorAll(".tab-btn");
   const formContainers = document.querySelectorAll(".form-container");
-  const showMainViewBtn = document.getElementById("show-main-view-btn");
-  const showReportsViewBtn = document.getElementById("show-reports-view-btn");
+
+
+  const viewNavButtons = document.querySelectorAll(".view-tab-btn");
   const mainView = document.getElementById("main-view");
+  const categoriesView = document.getElementById("categories-view");
   const reportsView = document.getElementById("reports-view");
 
   const expenseForm = document.getElementById("expense-form");
@@ -54,6 +56,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const incomeEditIdInput = document.getElementById("income-edit-id");
   const incomeSubmitBtn = document.getElementById("income-submit-btn");
   const cancelIncomeEditBtn = document.getElementById("cancel-income-edit-btn");
+
+
+  const newExpenseCategoryInput = document.getElementById(
+    "new-expense-category-input"
+  );
+  const addExpenseCategoryBtn = document.getElementById(
+    "add-expense-category-btn"
+  );
+  const expenseCategoryList = document.getElementById("expense-category-list");
+  const newIncomeCategoryInput = document.getElementById(
+    "new-income-category-input"
+  );
+  const addIncomeCategoryBtn = document.getElementById(
+    "add-income-category-btn"
+  );
+  const incomeCategoryList = document.getElementById("income-category-list");
 
   const transactionList = document.getElementById("transaction-list");
   const monthlyIncomeSpan = document.getElementById("monthly-income");
@@ -84,15 +102,38 @@ document.addEventListener("DOMContentLoaded", () => {
   let pendingCredential;
   let allTransactions = [];
   let userBudgets = {};
-  let unsubscribeFromExpenses, unsubscribeFromIncomes, unsubscribeFromBudgets;
 
-  // --- Lógica de Autenticação --- //
-  showRegisterLink.addEventListener("click", (e) => {
+  // -- Variáveis de Categoria -- //
+  const defaultExpenseCategories = [
+    "Alimentação",
+    "Transporte",
+    "Lazer",
+    "Moradia",
+    "Saúde",
+    "Outros",
+  ];
+  const defaultIncomeCategories = [
+    "Salário",
+    "Investimentos",
+    "Freelance",
+    "Presente",
+    "Outros",
+  ];
+  let customExpenseCategories = [];
+  let customIncomeCategories = [];
+
+  let unsubscribeFromExpenses,
+    unsubscribeFromIncomes,
+    unsubscribeFromBudgets,
+    unsubscribeFromCategories;
+
+ 
+  document.getElementById("show-register").addEventListener("click", (e) => {
     e.preventDefault();
     loginView.style.display = "none";
     registerView.style.display = "block";
   });
-  showLoginLink.addEventListener("click", (e) => {
+  document.getElementById("show-login").addEventListener("click", (e) => {
     e.preventDefault();
     registerView.style.display = "none";
     loginView.style.display = "block";
@@ -181,14 +222,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (unsubscribeFromExpenses) unsubscribeFromExpenses();
     if (unsubscribeFromIncomes) unsubscribeFromIncomes();
     if (unsubscribeFromBudgets) unsubscribeFromBudgets();
+    if (unsubscribeFromCategories) unsubscribeFromCategories();
     allTransactions = [];
     userBudgets = {};
+    customExpenseCategories = [];
+    customIncomeCategories = [];
     renderAll();
   }
 
   tabs.forEach((tab) => {
     tab.addEventListener("click", () => {
-      // Apenas alterna se não estiver em modo de edição
       if (!incomeEditIdInput.value && !expenseEditIdInput.value) {
         tabs.forEach((item) => item.classList.remove("active"));
         formContainers.forEach((container) =>
@@ -202,19 +245,29 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  showMainViewBtn.addEventListener("click", () => {
-    mainView.style.display = "block";
-    reportsView.style.display = "none";
-    showMainViewBtn.classList.add("active");
-    showReportsViewBtn.classList.remove("active");
-  });
+  viewNavButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      
+      viewNavButtons.forEach((btn) => btn.classList.remove("active"));
+      document
+        .querySelectorAll('#app-content > div[id$="-view"]')
+        .forEach((view) => {
+          view.style.display = "none";
+        });
 
-  showReportsViewBtn.addEventListener("click", () => {
-    mainView.style.display = "none";
-    reportsView.style.display = "block";
-    showMainViewBtn.classList.remove("active");
-    showReportsViewBtn.classList.add("active");
-    renderReports();
+     
+      button.classList.add("active");
+      const viewId = button.id.replace("show-", "").replace("-btn", "");
+      const viewToShow = document.getElementById(viewId);
+      if (viewToShow) {
+        viewToShow.style.display = "block";
+      }
+
+    
+      if (viewId === "reports-view") {
+        renderReports();
+      }
+    });
   });
 
   function loadUserData(userId) {
@@ -255,8 +308,163 @@ document.addEventListener("DOMContentLoaded", () => {
       userBudgets = doc.exists ? doc.data() : {};
       renderAll();
     });
+
+   
+    const categoriesDocRef = db
+      .collection("users")
+      .doc(userId)
+      .collection("config")
+      .doc("categories");
+    unsubscribeFromCategories = categoriesDocRef.onSnapshot((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        customExpenseCategories = data.expenseCategories || [];
+        customIncomeCategories = data.incomeCategories || [];
+      } else {
+        customExpenseCategories = [];
+        customIncomeCategories = [];
+      }
+      populateCategoryDropdowns();
+      renderCategoryManagementLists();
+      renderAll(); 
+    });
   }
 
+ 
+  function populateCategoryDropdowns() {
+    const allExpenseCategories = [
+      ...defaultExpenseCategories,
+      ...customExpenseCategories,
+    ];
+    const allIncomeCategories = [
+      ...defaultIncomeCategories,
+      ...customIncomeCategories,
+    ];
+
+   
+    const selectedExpense = expenseCategoryInput.value;
+    const selectedIncome = incomeCategoryInput.value;
+
+    expenseCategoryInput.innerHTML =
+      '<option value="" disabled>Selecione uma categoria</option>';
+    allExpenseCategories.forEach((cat) => {
+      const option = document.createElement("option");
+      option.value = cat;
+      option.textContent = cat;
+      expenseCategoryInput.appendChild(option);
+    });
+
+    incomeCategoryInput.innerHTML =
+      '<option value="" disabled>Selecione uma categoria</option>';
+    allIncomeCategories.forEach((cat) => {
+      const option = document.createElement("option");
+      option.value = cat;
+      option.textContent = cat;
+      incomeCategoryInput.appendChild(option);
+    });
+
+   
+    expenseCategoryInput.value = selectedExpense || "";
+    incomeCategoryInput.value = selectedIncome || "";
+  }
+
+  function renderCategoryManagementLists() {
+    expenseCategoryList.innerHTML = "";
+    customExpenseCategories.forEach((cat) => {
+      const li = document.createElement("li");
+      li.className = "category-list-item";
+      li.innerHTML = `<span>${cat}</span><button class="delete-category-btn" data-type="expense" data-category="${cat}">&times;</button>`;
+      expenseCategoryList.appendChild(li);
+    });
+
+    incomeCategoryList.innerHTML = "";
+    customIncomeCategories.forEach((cat) => {
+      const li = document.createElement("li");
+      li.className = "category-list-item";
+      li.innerHTML = `<span>${cat}</span><button class="delete-category-btn" data-type="income" data-category="${cat}">&times;</button>`;
+      incomeCategoryList.appendChild(li);
+    });
+  }
+
+  async function saveCategoriesToDB() {
+    const user = auth.currentUser;
+    if (!user) return;
+    const categoriesDocRef = db
+      .collection("users")
+      .doc(user.uid)
+      .collection("config")
+      .doc("categories");
+    try {
+      await categoriesDocRef.set(
+        {
+          expenseCategories: customExpenseCategories,
+          incomeCategories: customIncomeCategories,
+        },
+        { merge: true }
+      );
+    } catch (error) {
+      console.error("Erro ao salvar categorias:", error);
+      alert("Não foi possível salvar as categorias.");
+    }
+  }
+
+  addExpenseCategoryBtn.addEventListener("click", () => {
+    const newCategory = newExpenseCategoryInput.value.trim();
+    if (
+      newCategory &&
+      ![...defaultExpenseCategories, ...customExpenseCategories].includes(
+        newCategory
+      )
+    ) {
+      customExpenseCategories.push(newCategory);
+      saveCategoriesToDB();
+      newExpenseCategoryInput.value = "";
+    } else if (!newCategory) {
+      alert("O nome da categoria não pode estar vazio.");
+    } else {
+      alert("Esta categoria já existe.");
+    }
+  });
+
+  addIncomeCategoryBtn.addEventListener("click", () => {
+    const newCategory = newIncomeCategoryInput.value.trim();
+    if (
+      newCategory &&
+      ![...defaultIncomeCategories, ...customIncomeCategories].includes(
+        newCategory
+      )
+    ) {
+      customIncomeCategories.push(newCategory);
+      saveCategoriesToDB();
+      newIncomeCategoryInput.value = "";
+    } else if (!newCategory) {
+      alert("O nome da categoria não pode estar vazio.");
+    } else {
+      alert("Esta categoria já existe.");
+    }
+  });
+
+  function handleCategoryDelete(e) {
+    if (!e.target.classList.contains("delete-category-btn")) return;
+    const type = e.target.dataset.type;
+    const category = e.target.dataset.category;
+
+    if (type === "expense") {
+      customExpenseCategories = customExpenseCategories.filter(
+        (c) => c !== category
+      );
+    } else if (type === "income") {
+      customIncomeCategories = customIncomeCategories.filter(
+        (c) => c !== category
+      );
+    }
+    saveCategoriesToDB();
+  }
+
+  expenseCategoryList.addEventListener("click", handleCategoryDelete);
+  incomeCategoryList.addEventListener("click", handleCategoryDelete);
+
+  
   function updateTransactions(type, data) {
     allTransactions = allTransactions
       .filter((t) => t.type !== type)
@@ -287,7 +495,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // NOVA FUNÇÃO: Atualiza uma transação existente no DB
   async function updateTransactionInDB(id, type, data) {
     const user = auth.currentUser;
     if (!user) return;
@@ -361,8 +568,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const sign = t.type === "expense" ? "-" : "+";
         const listItem = document.createElement("li");
         listItem.className = `transaction-item ${t.type}`;
-
-        // ATUALIZAÇÃO: Botões com ÍCONES SVG no lugar do texto.
         listItem.innerHTML = `
             <div class="transaction-info">
                 <span class="description">${t.description}</span>
@@ -386,8 +591,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- LÓGICA DE EDIÇÃO --- //
-
-  // NOVA FUNÇÃO: Prepara o formulário para edição
   function handleStartEdit(id, type) {
     const transactionToEdit = allTransactions.find((t) => t.id === id);
     if (!transactionToEdit) return;
@@ -401,7 +604,6 @@ document.addEventListener("DOMContentLoaded", () => {
       document
         .getElementById("expense-form-container")
         .classList.add("editing");
-      // Ativa a tab correta
       tabs.forEach((tab) => tab.classList.remove("active"));
       document
         .querySelector('.tab-btn[data-tab="expense-form-container"]')
@@ -415,7 +617,6 @@ document.addEventListener("DOMContentLoaded", () => {
       incomeEditIdInput.value = id;
       incomeSubmitBtn.textContent = "Salvar Alterações";
       document.getElementById("income-form-container").classList.add("editing");
-      // Ativa a tab correta
       tabs.forEach((tab) => tab.classList.remove("active"));
       document
         .querySelector('.tab-btn[data-tab="income-form-container"]')
@@ -423,11 +624,9 @@ document.addEventListener("DOMContentLoaded", () => {
       formContainers.forEach((c) => c.classList.remove("active"));
       document.getElementById("income-form-container").classList.add("active");
     }
-
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  // NOVA FUNÇÃO: Reseta ambos os formulários para o estado inicial
   function resetForms() {
     expenseForm.reset();
     expenseEditIdInput.value = "";
@@ -442,9 +641,12 @@ document.addEventListener("DOMContentLoaded", () => {
     document
       .getElementById("income-form-container")
       .classList.remove("editing");
+
+   
+    expenseCategoryInput.value = "";
+    incomeCategoryInput.value = "";
   }
 
-  // --- EVENT LISTENERS ATUALIZADOS --- //
 
   expenseForm.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -465,10 +667,8 @@ document.addEventListener("DOMContentLoaded", () => {
       data.amount > 0
     ) {
       if (editId) {
-        // Modo Edição
         updateTransactionInDB(editId, "expense", data);
       } else {
-        // Modo Adição
         addTransactionToDB("expense", data, user.uid);
       }
       resetForms();
@@ -498,10 +698,8 @@ document.addEventListener("DOMContentLoaded", () => {
       data.amount > 0
     ) {
       if (editId) {
-        // Modo Edição
         updateTransactionInDB(editId, "income", data);
       } else {
-        // Modo Adição
         addTransactionToDB("income", data, user.uid);
       }
       resetForms();
@@ -512,7 +710,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Listener ATUALIZADO para a lista de transações (agora ouve por editar e excluir)
   transactionList.addEventListener("click", (event) => {
     const target = event.target.closest("button");
     if (!target) return;
@@ -530,8 +727,7 @@ document.addEventListener("DOMContentLoaded", () => {
   cancelExpenseEditBtn.addEventListener("click", resetForms);
   cancelIncomeEditBtn.addEventListener("click", resetForms);
 
-  // --- RESTANTE DO CÓDIGO (MÉTRICAS, GRÁFICOS, FILTROS, TEMA) --- //
-
+  
   function calculateAndRenderMetrics(transactions) {
     let totalIncome = 0;
     let totalExpenses = 0;
@@ -574,9 +770,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderBudgetProgress(spentByCategory) {
     budgetSection.innerHTML = "";
-    const categories = [...expenseCategoryInput.options]
-      .map((opt) => opt.value)
-      .filter((val) => val);
+    const categories = [
+      ...defaultExpenseCategories,
+      ...customExpenseCategories,
+    ];
 
     categories.forEach((category) => {
       const budgetAmount = userBudgets[category] || 0;
@@ -678,7 +875,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const isDarkMode = document.body.classList.contains("dark-mode");
       ctx.fillStyle = isDarkMode ? "#F3F4F6" : "#1E293B";
-
       ctx.font = "bold 20px Inter";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -692,7 +888,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderOrUpdateDoughnutChart(categoryData) {
     if (expenseChart) expenseChart.destroy();
-
     const isDarkMode = document.body.classList.contains("dark-mode");
     const legendColor = isDarkMode ? "#9CA3AF" : "#64748B";
 
@@ -721,12 +916,7 @@ document.addEventListener("DOMContentLoaded", () => {
         maintainAspectRatio: false,
         cutout: "70%",
         plugins: {
-          legend: {
-            position: "bottom",
-            labels: {
-              color: legendColor,
-            },
-          },
+          legend: { position: "bottom", labels: { color: legendColor } },
         },
       },
       plugins: [centerTextPlugin],
@@ -808,10 +998,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ticks: { callback: (value) => `R$ ${value}`, color: textColor },
             grid: { color: gridColor },
           },
-          x: {
-            ticks: { color: textColor },
-            grid: { color: gridColor },
-          },
+          x: { ticks: { color: textColor }, grid: { color: gridColor } },
         },
       },
     });
@@ -866,10 +1053,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ticks: { callback: (value) => `R$ ${value}`, color: textColor },
             grid: { color: gridColor },
           },
-          y: {
-            ticks: { color: textColor },
-            grid: { color: gridColor },
-          },
+          y: { ticks: { color: textColor }, grid: { color: gridColor } },
         },
       },
     });
@@ -895,7 +1079,6 @@ document.addEventListener("DOMContentLoaded", () => {
       : "dark";
     localStorage.setItem("theme", currentTheme);
     applyTheme(currentTheme);
-
     renderAll();
     if (reportsView.style.display === "block") {
       renderReports();
