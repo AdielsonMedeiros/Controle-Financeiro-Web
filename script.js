@@ -891,8 +891,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const centerY = chart.chartArea.top + height / 2;
 
       const isDarkMode = document.body.classList.contains("dark-mode");
-      ctx.fillStyle = isDarkMode ? "#F3F4F6" : "#1E293B";
-      ctx.font = "bold 20px Inter";
+      ctx.fillStyle = isDarkMode ? "#FFFFFF" : "#1E293B";
+      ctx.font = "bold 22px Inter";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       const total = chart.data.datasets[0].data.reduce(
@@ -924,7 +924,10 @@ document.addEventListener("DOMContentLoaded", () => {
               "#9966FF",
               "#FF9F40",
             ],
-            borderWidth: 0,
+            borderWidth: 2,
+            borderColor: "#ffffff",
+            hoverBorderWidth: 3,
+            hoverBorderColor: "#ffffff",
           },
         ],
       },
@@ -932,8 +935,36 @@ document.addEventListener("DOMContentLoaded", () => {
         responsive: true,
         maintainAspectRatio: false,
         cutout: "70%",
+        animation: {
+          animateRotate: true,
+          animateScale: true,
+          duration: 1500,
+          easing: 'easeInOutQuart',
+        },
         plugins: {
-          legend: { position: "bottom", labels: { color: legendColor } },
+          legend: {
+            position: "bottom",
+            labels: {
+              color: legendColor,
+              padding: 15,
+              font: {
+                size: 13,
+                weight: '500'
+              }
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            padding: 12,
+            cornerRadius: 8,
+            titleFont: {
+              size: 14,
+              weight: 'bold'
+            },
+            bodyFont: {
+              size: 13
+            }
+          }
         },
       },
       plugins: [centerTextPlugin],
@@ -1008,14 +1039,44 @@ document.addEventListener("DOMContentLoaded", () => {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { labels: { color: textColor } } },
+        animation: {
+          duration: 1200,
+          easing: 'easeInOutQuart',
+        },
+        plugins: {
+          legend: {
+            labels: {
+              color: textColor,
+              padding: 15,
+              font: {
+                size: 13,
+                weight: '500'
+              }
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            padding: 12,
+            cornerRadius: 8,
+            titleFont: {
+              size: 14,
+              weight: 'bold'
+            },
+            bodyFont: {
+              size: 13
+            }
+          }
+        },
         scales: {
           y: {
             beginAtZero: true,
             ticks: { callback: (value) => `R$ ${value}`, color: textColor },
-            grid: { color: gridColor },
+            grid: { color: gridColor, lineWidth: 1 },
           },
-          x: { ticks: { color: textColor }, grid: { color: gridColor } },
+          x: {
+            ticks: { color: textColor },
+            grid: { color: gridColor, lineWidth: 1 }
+          },
         },
       },
     });
@@ -1064,13 +1125,34 @@ document.addEventListener("DOMContentLoaded", () => {
         indexAxis: "y",
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
+        animation: {
+          duration: 1200,
+          easing: 'easeInOutQuart',
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            padding: 12,
+            cornerRadius: 8,
+            titleFont: {
+              size: 14,
+              weight: 'bold'
+            },
+            bodyFont: {
+              size: 13
+            }
+          }
+        },
         scales: {
           x: {
             ticks: { callback: (value) => `R$ ${value}`, color: textColor },
-            grid: { color: gridColor },
+            grid: { color: gridColor, lineWidth: 1 },
           },
-          y: { ticks: { color: textColor }, grid: { color: gridColor } },
+          y: {
+            ticks: { color: textColor },
+            grid: { color: gridColor, lineWidth: 1 }
+          },
         },
       },
     });
