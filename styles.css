@@ -67,6 +67,77 @@ h3 {
   font-size: 18px;
 }
 
+/* Banner do App Mobile */
+.app-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  padding: 14px 18px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.app-banner.hidden {
+  display: none;
+}
+
+.app-banner-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-banner-icon svg {
+  color: #ffffff;
+}
+
+.app-banner-text {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.app-banner-text strong {
+  font-weight: 600;
+}
+
+.app-banner-text a {
+  color: #ffffff;
+  text-decoration: underline;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+.app-banner-text a:hover {
+  opacity: 0.8;
+}
+
+.app-banner-close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 28px;
+  line-height: 1;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.app-banner-close:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
 hr {
   border: 0;
   height: 1px;
@@ -745,6 +816,16 @@ button:hover {
   #custom-date-range {
     width: 100%;
   }
+
+  .app-banner {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .app-banner-text {
+    font-size: 13px;
+    line-height: 1.5;
+  }
 }
 
 @media (max-width: 576px) {
@@ -784,6 +865,20 @@ button:hover {
     font-size: 14px;
     padding: 12px 8px;
   }
+
+  .app-banner {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .app-banner-icon {
+    display: none;
+  }
+
+  .app-banner-text {
+    font-size: 12px;
+    line-height: 1.5;
+  }
 }
 
 body.dark-mode {
@@ -800,6 +895,11 @@ body.dark-mode {
 body.dark-mode #user-info {
   background-color: var(--cor-fundo);
   border-color: var(--cor-borda);
+}
+
+body.dark-mode .app-banner {
+  background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
 }
 
 body.dark-mode input[type="text"],

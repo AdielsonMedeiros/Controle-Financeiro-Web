@@ -98,6 +98,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const moonIcon = document.getElementById("moon-icon");
   const sunIcon = document.getElementById("sun-icon");
 
+  // Banner do App Mobile
+  const mobileAppBanner = document.getElementById("mobile-app-banner");
+  const closeBannerBtn = document.getElementById("close-app-banner");
+
   let expenseChart, monthlyEvolutionChart, categoryComparisonChart;
   let pendingCredential;
   let allTransactions = [];
@@ -127,7 +131,20 @@ document.addEventListener("DOMContentLoaded", () => {
     unsubscribeFromBudgets,
     unsubscribeFromCategories;
 
- 
+
+  // --- Controle do Banner do App Mobile --- //
+  // Verifica se o banner já foi fechado anteriormente
+  const bannerDismissed = localStorage.getItem("mobileAppBannerDismissed");
+  if (bannerDismissed === "true") {
+    mobileAppBanner.classList.add("hidden");
+  }
+
+  // Evento para fechar o banner
+  closeBannerBtn.addEventListener("click", () => {
+    mobileAppBanner.classList.add("hidden");
+    localStorage.setItem("mobileAppBannerDismissed", "true");
+  });
+
   document.getElementById("show-register").addEventListener("click", (e) => {
     e.preventDefault();
     loginView.style.display = "none";
