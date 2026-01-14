@@ -6,6 +6,91 @@ document.addEventListener("DOMContentLoaded", () => {
   const db = firebase.firestore();
   const auth = firebase.auth();
 
+  // --- Sistema de Notificações (Toast) --- //
+  function showToast(message, type = "info") {
+    const container = document.getElementById("toast-container");
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+
+    let icon = "";
+    if (type === "success") {
+      icon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+    } else if (type === "error") {
+      icon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`;
+    } else if (type === "warning") {
+      icon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+    } else {
+      icon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+    }
+
+    toast.innerHTML = `
+      <div class="toast-icon">${icon}</div>
+      <div class="toast-message">${message}</div>
+      <button class="toast-close">&times;</button>
+    `;
+
+    container.appendChild(toast);
+
+    // Remove o toast após 4 segundos
+    setTimeout(() => {
+      toast.style.animation = "fadeOutToast 0.3s ease-in forwards";
+      toast.addEventListener("animationend", () => {
+        toast.remove();
+      });
+    }, 4000);
+
+    // Fechar ao clicar no botão
+    toast.querySelector(".toast-close").addEventListener("click", () => {
+      toast.style.animation = "fadeOutToast 0.3s ease-in forwards";
+      toast.addEventListener("animationend", () => {
+        toast.remove();
+      });
+    });
+  }
+
+  function getErrorMsg(error) {
+    let message = "Ocorreu um erro desconhecido.";
+    
+    if (typeof error === 'string') {
+        message = error;
+    } else if (error && error.message) {
+        message = error.message;
+    }
+
+    // Tenta fazer o parse se parecer um JSON
+    try {
+        if (message.trim().startsWith('{')) {
+            const parsed = JSON.parse(message);
+            if (parsed && parsed.error && parsed.error.message) {
+                message = parsed.error.message;
+            } else if (parsed && parsed.message) {
+                message = parsed.message;
+            }
+        }
+    } catch (e) {
+        // Não é JSON, continua com a mensagem original
+    }
+
+    const errorCodes = {
+        'INVALID_LOGIN_CREDENTIALS': 'Email ou senha incorretos.',
+        'INVALID_PASSWORD': 'Senha incorreta.',
+        'EMAIL_NOT_FOUND': 'Este email não está cadastrado.',
+        'USER_DISABLED': 'Esta conta foi desativada.',
+        'auth/invalid-email': 'O endereço de email é inválido.',
+        'auth/user-disabled': 'Este usuário foi desativado.',
+        'auth/user-not-found': 'Usuário não encontrado.',
+        'auth/wrong-password': 'Email ou senha incorretos.',
+        'auth/email-already-in-use': 'O endereço de email já está em uso.',
+        'auth/weak-password': 'A senha deve ter pelo menos 6 caracteres.',
+        'auth/account-exists-with-different-credential': 'Conta já existe com credenciais diferentes. Faça login com o método original.',
+        'auth/popup-closed-by-user': 'O login foi cancelado pelo usuário.',
+        'auth/cancelled-popup-request': 'A solicitação de login foi cancelada.'
+    };
+
+    return errorCodes[message] || message;
+  }
+
+
   // --- Seleção de Elementos DOM --- //
   const authContainer = document.getElementById("auth-container");
   const appContent = document.getElementById("app-content");
@@ -164,13 +249,14 @@ document.addEventListener("DOMContentLoaded", () => {
           let providerName = methods.includes("password")
             ? "E-mail e Senha"
             : methods[0];
-          alert(
-            `Você já tem uma conta com este e-mail usando: ${providerName}. Faça login com este método para vincular suas contas.`
+          showToast(
+            `Você já tem uma conta com este e-mail usando: ${providerName}. Faça login com este método para vincular suas contas.`,
+            "info"
           );
         });
       } else {
         console.error(`Erro no login com ${provider.providerId}: `, error);
-        alert(`Erro ao fazer login: ${error.message}`);
+        showToast(`Erro ao fazer login: ${getErrorMsg(error)}`, "error");
       }
     });
   }
@@ -185,19 +271,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const email = loginEmailInput.value;
     const password = loginPasswordInput.value;
     if (!email || !password)
-      return alert("Por favor, preencha e-mail e senha.");
+      return showToast("Por favor, preencha e-mail e senha.", "warning");
     auth
       .signInWithEmailAndPassword(email, password)
-      .catch((error) => alert(`Erro ao fazer login: ${error.message}`));
+      .catch((error) => showToast(`Erro ao fazer login: ${getErrorMsg(error)}`, "error"));
   });
   registerBtn.addEventListener("click", () => {
     const email = registerEmailInput.value;
     const password = registerPasswordInput.value;
     if (!email || !password)
-      return alert("Por favor, preencha e-mail e senha.");
+      return showToast("Por favor, preencha e-mail e senha.", "warning");
     auth
       .createUserWithEmailAndPassword(email, password)
-      .catch((error) => alert(`Erro ao registrar: ${error.message}`));
+      .catch((error) => showToast(`Erro ao registrar: ${getErrorMsg(error)}`, "error"));
   });
   logoutBtn.addEventListener("click", () => auth.signOut());
 
@@ -207,11 +293,11 @@ document.addEventListener("DOMContentLoaded", () => {
         user
           .linkWithCredential(pendingCredential)
           .then(() => {
-            alert("Sua conta foi vinculada com sucesso!");
+            showToast("Sua conta foi vinculada com sucesso!", "success");
             pendingCredential = null;
           })
           .catch((error) => {
-            alert(`Não foi possível vincular a conta: ${error.message}`);
+            showToast(`Não foi possível vincular a conta: ${getErrorMsg(error)}`, "error");
             pendingCredential = null;
           });
       }
@@ -257,7 +343,10 @@ document.addEventListener("DOMContentLoaded", () => {
         tab.classList.add("active");
         document.getElementById(tab.dataset.tab).classList.add("active");
       } else {
-        alert("Por favor, finalize a edição atual antes de trocar de aba.");
+        showToast(
+          "Por favor, finalize a edição atual antes de trocar de aba.",
+          "warning"
+        );
       }
     });
   });
@@ -421,7 +510,7 @@ document.addEventListener("DOMContentLoaded", () => {
       );
     } catch (error) {
       console.error("Erro ao salvar categorias:", error);
-      alert("Não foi possível salvar as categorias.");
+      showToast("Não foi possível salvar as categorias.", "error");
     }
   }
 
@@ -437,9 +526,9 @@ document.addEventListener("DOMContentLoaded", () => {
       saveCategoriesToDB();
       newExpenseCategoryInput.value = "";
     } else if (!newCategory) {
-      alert("O nome da categoria não pode estar vazio.");
+      showToast("O nome da categoria não pode estar vazio.", "warning");
     } else {
-      alert("Esta categoria já existe.");
+      showToast("Esta categoria já existe.", "warning");
     }
   });
 
@@ -455,9 +544,9 @@ document.addEventListener("DOMContentLoaded", () => {
       saveCategoriesToDB();
       newIncomeCategoryInput.value = "";
     } else if (!newCategory) {
-      alert("O nome da categoria não pode estar vazio.");
+      showToast("O nome da categoria não pode estar vazio.", "warning");
     } else {
-      alert("Esta categoria já existe.");
+      showToast("Esta categoria já existe.", "warning");
     }
   });
 
@@ -508,7 +597,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     } catch (error) {
       console.error(`Erro ao adicionar ${type}: `, error);
-      alert(`Não foi possível salvar a transação.`);
+      showToast(`Não foi possível salvar a transação.`, "error");
     }
   }
 
@@ -525,7 +614,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .update(data);
     } catch (error) {
       console.error(`Erro ao atualizar ${type}: `, error);
-      alert("Não foi possível salvar as alterações.");
+      showToast("Não foi possível salvar as alterações.", "error");
     }
   }
 
@@ -543,7 +632,7 @@ document.addEventListener("DOMContentLoaded", () => {
           .delete();
       } catch (error) {
         console.error(`Erro ao excluir ${type}: `, error);
-        alert("Não foi possível excluir a transação.");
+        showToast("Não foi possível excluir a transação.", "error");
       }
     }
   }
@@ -566,10 +655,10 @@ document.addEventListener("DOMContentLoaded", () => {
         .collection("orcamentos")
         .doc("mensal")
         .set(newBudgets, { merge: true });
-      alert("Orçamentos salvos com sucesso!");
+      showToast("Orçamentos salvos com sucesso!", "success");
     } catch (error) {
       console.error("Erro ao salvar orçamentos: ", error);
-      alert("Não foi possível salvar os orçamentos.");
+      showToast("Não foi possível salvar os orçamentos.", "error");
     }
   }
 
@@ -690,8 +779,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       resetForms();
     } else {
-      alert(
-        "Por favor, preencha todos os campos do gasto com valores válidos."
+      showToast(
+        "Por favor, preencha todos os campos do gasto com valores válidos.",
+        "warning"
       );
     }
   });
@@ -721,8 +811,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       resetForms();
     } else {
-      alert(
-        "Por favor, preencha todos os campos da receita com valores válidos."
+      showToast(
+        "Por favor, preencha todos os campos da receita com valores válidos.",
+        "warning"
       );
     }
   });
