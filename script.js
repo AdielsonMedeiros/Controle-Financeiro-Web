@@ -321,6 +321,18 @@ document.addEventListener("DOMContentLoaded", () => {
     userAvatar.src =
       user.photoURL ||
       `https://ui-avatars.com/api/?name=${user.email}&background=random`;
+    
+    // Ensure main-view (Visão Geral) is shown by default
+    document.querySelectorAll('#app-content > div[id$="-view"]').forEach((view) => {
+      view.style.display = "none";
+    });
+    const mainView = document.getElementById("main-view");
+    if (mainView) mainView.style.display = "block";
+    
+    // Set the correct navigation button as active
+    viewNavButtons.forEach((btn) => btn.classList.remove("active"));
+    const mainViewBtn = document.getElementById("show-main-view-btn");
+    if (mainViewBtn) mainViewBtn.classList.add("active");
   }
 
   function setupUIForLoggedOutUser() {
