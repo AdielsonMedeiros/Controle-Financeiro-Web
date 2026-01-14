@@ -309,7 +309,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   function setupUIForLoggedInUser(user) {
-    authContainer.style.display = "none";
+    // Hide auth wrapper, show dashboard wrapper
+    const authWrapper = document.getElementById("auth-wrapper");
+    const dashboardWrapper = document.getElementById("dashboard-wrapper");
+    if (authWrapper) authWrapper.style.display = "none";
+    if (dashboardWrapper) dashboardWrapper.style.display = "block";
+    
     appContent.style.display = "block";
     userInfo.style.display = "flex";
     userEmailSpan.textContent = user.email;
@@ -319,9 +324,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function setupUIForLoggedOutUser() {
-    authContainer.style.display = "block";
-    appContent.style.display = "none";
-    userInfo.style.display = "none";
+    // Show auth wrapper, hide dashboard wrapper
+    const authWrapper = document.getElementById("auth-wrapper");
+    const dashboardWrapper = document.getElementById("dashboard-wrapper");
+    if (authWrapper) authWrapper.style.display = "flex";
+    if (dashboardWrapper) dashboardWrapper.style.display = "none";
+    
     if (unsubscribeFromExpenses) unsubscribeFromExpenses();
     if (unsubscribeFromIncomes) unsubscribeFromIncomes();
     if (unsubscribeFromBudgets) unsubscribeFromBudgets();
