@@ -6,9 +6,12 @@
   padding: 0;
   max-height: 450px;
   overflow-y: auto;
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 .transaction-item {
+  width: 100%; /* Ensure it fits container */
+  box-sizing: border-box;
   background-color: #ffffff;
   padding: 16px;
   border: 1px solid var(--cor-borda);
