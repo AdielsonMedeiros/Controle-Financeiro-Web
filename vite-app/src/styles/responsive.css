@@ -16,6 +16,57 @@
 
 /* Medium screens */
 @media (max-width: 768px) {
+  /* Auth Split Screen - Stack vertically */
+  .auth-wrapper {
+    flex-direction: column;
+  }
+
+  .auth-branding {
+    padding: 40px 24px;
+    min-height: auto;
+  }
+
+  .branding-logo {
+    width: 70px;
+    height: 70px;
+    margin-bottom: 20px;
+  }
+
+  .branding-logo svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .branding-title {
+    font-size: 28px;
+  }
+
+  .branding-tagline {
+    font-size: 15px;
+    margin-bottom: 24px;
+  }
+
+  .branding-features {
+    gap: 12px;
+  }
+
+  .feature-item {
+    font-size: 13px;
+    padding: 10px 16px;
+  }
+
+  .branding-footer {
+    display: none;
+  }
+
+  .auth-form-panel {
+    padding: 32px 24px;
+  }
+
+  .auth-form-title {
+    font-size: 24px;
+  }
+
   .dashboard-wrapper {
     padding: 0 16px 24px;
   }
@@ -75,6 +126,27 @@
 
 /* Small screens */
 @media (max-width: 576px) {
+  /* Auth adjustments for small mobile */
+  .auth-branding {
+    padding: 32px 20px;
+  }
+
+  .branding-title {
+    font-size: 24px;
+  }
+
+  .branding-tagline {
+    font-size: 14px;
+  }
+
+  .branding-features {
+    display: none; /* Economy space on very small screens */
+  }
+
+  .auth-form-panel {
+    padding: 24px 16px;
+  }
+
   h1 {
     font-size: 28px;
   }

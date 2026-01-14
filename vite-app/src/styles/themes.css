@@ -151,3 +151,19 @@ body.dark-mode .filters-container {
 body.dark-mode .budget-progress-bar {
   background-color: #374151;
 }
+
+body.dark-mode .auth-form-panel {
+  background-color: var(--cor-fundo);
+}
+
+body.dark-mode .auth-form-title {
+  color: var(--cor-texto);
+}
+
+body.dark-mode .auth-subtitle {
+  color: var(--cor-texto-suave);
+}
+
+body.dark-mode .social-icon-btn svg path {
+  fill: #e5e7eb;
+}

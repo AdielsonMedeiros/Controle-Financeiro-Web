@@ -190,3 +190,48 @@
 .app-banner-close::before {
   display: none;
 }
+
+/* Banner adjustments for Left Panel */
+.left-panel-banner {
+  margin-top: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  animation: fadeInUp 0.5s ease-out 0.4s backwards;
+}
+
+.left-panel-banner .app-banner-text {
+  color: #ffffff;
+  font-size: 13px;
+}
+
+.left-panel-banner .app-banner-text a {
+  color: var(--cor-primaria-light);
+  text-decoration: none;
+  font-weight: 700;
+  border-bottom: 1px dashed var(--cor-primaria-light);
+}
+
+.left-panel-banner .app-banner-text a:hover {
+  color: #ffffff;
+  border-bottom-style: solid;
+}
+
+.left-panel-banner .app-banner-close {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.left-panel-banner .app-banner-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+/* Responsiveness for banner */
+@media (max-width: 768px) {
+  .left-panel-banner {
+    margin-top: 24px;
+    padding: 12px;
+  }
+}
