@@ -1,11 +1,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
 
 :root {
-  /* Cores Primárias */
-  --cor-primaria: #4f46e5;
-  --cor-primaria-hover: #4338ca;
-  --cor-primaria-light: #6366f1;
-  --cor-primaria-dark: #3730a3;
+  /* Cores Primárias - Mais Clean (Azul Inter) */
+  --cor-primaria: #3b82f6;
+  --cor-primaria-hover: #2563eb;
+  --cor-primaria-light: #60a5fa;
+  --cor-primaria-dark: #1d4ed8;
 
   /* Cores de Fundo */
   --cor-fundo: #f8fafc;
@@ -32,7 +32,7 @@
   --sombra-card: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
   --sombra-card-hover: 0 10px 25px rgba(0, 0, 0, 0.12), 0 5px 10px rgba(0, 0, 0, 0.08);
   --sombra-card-forte: 0 20px 40px rgba(0, 0, 0, 0.15), 0 10px 20px rgba(0, 0, 0, 0.1);
-  --sombra-botao: 0 2px 5px rgba(79, 70, 229, 0.3);
+  --sombra-botao: 0 2px 5px rgba(59, 130, 246, 0.3);
 
   /* Transições */
   --transicao-rapida: 0.15s ease;
@@ -63,9 +63,9 @@ body {
   font-family: "Inter", sans-serif;
   background-color: var(--cor-fundo);
   background-image:
-    linear-gradient(170deg, rgba(79, 70, 229, 0.03) 0%, transparent 40%),
-    linear-gradient(260deg, rgba(59, 130, 246, 0.02) 0%, transparent 50%),
-    linear-gradient(170deg, #f0f4ff 0%, #f8fafc 100%);
+    linear-gradient(170deg, rgba(59, 130, 246, 0.03) 0%, transparent 40%),
+    linear-gradient(260deg, rgba(96, 165, 250, 0.02) 0%, transparent 50%),
+    linear-gradient(170deg, #f0f7ff 0%, #f8fafc 100%);
   background-attachment: fixed;
   color: var(--cor-texto);
   display: flex;
