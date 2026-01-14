@@ -65,6 +65,7 @@ export async function addTransactionToDB(db, type, data, userId) {
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         ownerId: userId,
       });
+    showToast(`${type === "expense" ? "Gasto" : "Receita"} adicionado com sucesso!`, "success");
   } catch (error) {
     console.error(`Erro ao adicionar ${type}: `, error);
     showToast(`Não foi possível salvar a transação.`, "error");
@@ -83,6 +84,7 @@ export async function updateTransactionInDB(db, auth, id, type, data) {
       .collection(collectionName)
       .doc(id)
       .update(data);
+    showToast("Transação atualizada com sucesso!", "success");
   } catch (error) {
     console.error(`Erro ao atualizar ${type}: `, error);
     showToast("Não foi possível salvar as alterações.", "error");
@@ -102,6 +104,7 @@ export async function deleteTransactionFromDB(db, auth, id, type) {
         .collection(collectionName)
         .doc(id)
         .delete();
+      showToast("Transação excluída com sucesso!", "success");
     } catch (error) {
       console.error(`Erro ao excluir ${type}: `, error);
       showToast("Não foi possível excluir a transação.", "error");

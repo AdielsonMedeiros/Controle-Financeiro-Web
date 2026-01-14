@@ -87,6 +87,7 @@ export function addExpenseCategory(category, db, userId) {
   
   customExpenseCategories.push(newCategory);
   saveCategoriesToDB(db, userId);
+  showToast("Categoria adicionada com sucesso!", "success");
   return true;
 }
 
@@ -107,6 +108,7 @@ export function addIncomeCategory(category, db, userId) {
   
   customIncomeCategories.push(newCategory);
   saveCategoriesToDB(db, userId);
+  showToast("Categoria adicionada com sucesso!", "success");
   return true;
 }
 
@@ -114,12 +116,14 @@ export function addIncomeCategory(category, db, userId) {
 export function deleteExpenseCategory(category, db, userId) {
   customExpenseCategories = customExpenseCategories.filter((cat) => cat !== category);
   saveCategoriesToDB(db, userId);
+  showToast("Categoria removida.", "success");
 }
 
 // Delete income category
 export function deleteIncomeCategory(category, db, userId) {
   customIncomeCategories = customIncomeCategories.filter((cat) => cat !== category);
   saveCategoriesToDB(db, userId);
+  showToast("Categoria removida.", "success");
 }
 
 // Populate category select elements

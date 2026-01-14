@@ -1,6 +1,15 @@
 /* ===================================
    Form Components
    =================================== */
+.form-container {
+  display: none;
+}
+
+.form-container.active {
+  display: block;
+  animation: fadeInUp 0.5s ease-out;
+}
+
 .form-group {
   margin-bottom: 20px;
   animation: fadeInUp 0.5s ease-out;
@@ -302,4 +311,48 @@ button:active {
 
 .logout-btn::before {
   display: none;
+}
+
+/* ===================================
+   Standardized Buttons & Tabs (Blue Theme)
+   =================================== */
+
+/* Active Tabs - Blue Background, White Text */
+.tab-btn.active {
+  background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-primaria-hover) 100%);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+  border: none;
+}
+
+.tab-btn:hover:not(.active) {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--cor-primaria);
+}
+
+/* Ensure data-tab selectors don't override the standard style if they exist elsewhere, 
+   but since I'm confusing myself, let's just make sure the specific selectors are removed 
+   or reset. The best way is to simply NOT have the specific selectors I just added. 
+   So by replacing the block, they are gone. */
+
+/* Submit Buttons - Standard Blue */
+#expense-submit-btn,
+#income-submit-btn {
+  background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-primaria-hover) 100%);
+  box-shadow: var(--sombra-botao);
+  color: #ffffff;
+}
+
+#expense-submit-btn:hover,
+#income-submit-btn:hover {
+  background: linear-gradient(135deg, var(--cor-primaria-hover) 0%, var(--cor-primaria-dark) 100%);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Button generic */
+button {
+  border-radius: var(--radius-md);
+  letter-spacing: 0.3px;
 }
