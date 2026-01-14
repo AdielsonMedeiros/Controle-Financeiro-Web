@@ -1,0 +1,305 @@
+/* ===================================
+   Form Components
+   =================================== */
+.form-group {
+  margin-bottom: 20px;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: var(--cor-texto);
+  font-size: 14px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="password"],
+input[type="date"],
+select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-family: "Inter", sans-serif;
+  background-color: #ffffff;
+  transition: all var(--transicao-media);
+  color: var(--cor-texto);
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--cor-primaria);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+input::placeholder {
+  color: var(--cor-texto-extra-suave);
+}
+
+/* ===================================
+   Buttons
+   =================================== */
+button {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-primaria-hover) 100%);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transicao-media);
+  box-shadow: var(--sombra-botao);
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+button svg,
+.edit-btn svg,
+.delete-btn svg,
+.theme-btn svg {
+  flex-shrink: 0;
+  color: currentColor !important;
+  stroke: currentColor !important;
+}
+
+button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+button:hover::before {
+  left: 100%;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: var(--sombra-botao);
+}
+
+.form-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.cancel-edit-btn {
+  display: none;
+  background-color: var(--cor-texto-suave);
+}
+
+.cancel-edit-btn:hover {
+  background-color: var(--cor-texto);
+  transform: translateY(-2px);
+}
+
+.form-container.editing .cancel-edit-btn {
+  display: block;
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+  box-shadow: 0 2px 5px rgba(71, 85, 105, 0.3);
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, #475569 0%, #334155 100%);
+  box-shadow: 0 4px 12px rgba(71, 85, 105, 0.4);
+}
+
+/* ===================================
+   Tabs
+   =================================== */
+.tabs {
+  display: flex;
+  margin-bottom: 25px;
+  background-color: var(--cor-fundo);
+  border-radius: var(--radius-md);
+  padding: 6px;
+  border: 1px solid var(--cor-borda);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  gap: 8px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 18px;
+  background-color: transparent;
+  color: var(--cor-texto);
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transicao-media);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  transform: none;
+  width: auto;
+  box-shadow: none;
+}
+
+.tab-btn:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--cor-primaria);
+  transform: none;
+  box-shadow: none;
+}
+
+.tab-btn.active {
+  background-color: var(--cor-container);
+  color: var(--cor-primaria);
+  font-weight: 600;
+  box-shadow: var(--sombra-card);
+}
+
+/* ===================================
+   Social Login Buttons
+   =================================== */
+.social-login-section {
+  margin-top: 25px;
+  padding-top: 25px;
+  border-top: 1px solid var(--cor-borda);
+  text-align: center;
+}
+
+.social-login-title {
+  color: var(--cor-texto-suave);
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.social-login-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.social-icon-btn {
+  width: 50px !important;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transicao-media);
+  padding: 0;
+  border: 1px solid var(--cor-borda);
+  box-shadow: var(--sombra-card);
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+
+.social-icon-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+.social-icon-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: var(--sombra-card-hover);
+}
+
+.social-icon-btn::before {
+  display: none;
+}
+
+/* ===================================
+   Edit/Delete Buttons
+   =================================== */
+.edit-btn,
+.delete-btn {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto);
+  border: 1px solid var(--cor-borda);
+  border-radius: 8px;
+  transition: all var(--transicao-media);
+}
+
+.edit-btn:hover {
+  background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-primaria-light) 100%);
+  color: #ffffff;
+  border-color: var(--cor-primaria);
+  transform: none;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+}
+
+.delete-btn:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  color: #ffffff;
+  border-color: #dc2626;
+  transform: none;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+}
+
+/* ===================================
+   Theme Toggle Button
+   =================================== */
+.theme-btn {
+  width: auto;
+  padding: 8px;
+  background-color: #f1f5f9;
+  color: var(--cor-texto-suave);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-btn:hover {
+  background-color: #e2e8f0;
+  transform: none;
+  box-shadow: none;
+}
+
+.theme-btn::before {
+  display: none;
+}
+
+/* ===================================
+   Logout Button
+   =================================== */
+.logout-btn {
+  padding: 8px 16px !important;
+  font-size: 13px !important;
+  width: auto !important;
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto-suave);
+  border: 1px solid var(--cor-borda);
+}
+
+.logout-btn:hover {
+  background-color: var(--cor-erro);
+  color: white;
+  border-color: var(--cor-erro);
+}
+
+.logout-btn::before {
+  display: none;
+}

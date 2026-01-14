@@ -1,0 +1,153 @@
+/* ===================================
+   Dark Mode Theme
+   =================================== */
+body.dark-mode {
+  --cor-fundo: #111827;
+  --cor-container: #1f2937;
+  --cor-texto: #f3f4f6;
+  --cor-texto-suave: #9ca3af;
+  --cor-borda: #374151;
+  --cor-sucesso-fundo: #064e3b;
+  --cor-erro-fundo: #7f1d1d;
+  background-image: linear-gradient(170deg, #1f2937 0%, #111827 100%);
+}
+
+body.dark-mode .dashboard-header {
+  background: rgba(17, 24, 39, 0.9);
+  border-bottom-color: var(--cor-borda);
+}
+
+body.dark-mode .bento-card {
+  background-color: var(--cor-container);
+  border-color: var(--cor-borda);
+}
+
+body.dark-mode .header-user-info {
+  background-color: var(--cor-container);
+  border-color: var(--cor-borda);
+}
+
+body.dark-mode #user-info {
+  background-color: var(--cor-fundo);
+  border-color: var(--cor-borda);
+}
+
+body.dark-mode .app-banner {
+  background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
+}
+
+body.dark-mode .chart-container {
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  border-color: #374151;
+}
+
+body.dark-mode .summary-item {
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  border-color: #374151;
+}
+
+body.dark-mode .transaction-item {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+body.dark-mode input[type="text"],
+body.dark-mode input[type="number"],
+body.dark-mode input[type="password"],
+body.dark-mode input[type="date"],
+body.dark-mode select {
+  background-color: #374151;
+  color: var(--cor-texto);
+  border-color: #4b5563;
+}
+
+body.dark-mode .tabs {
+  background-color: #111827;
+}
+
+body.dark-mode .tab-btn.active {
+  background-color: var(--cor-container);
+}
+
+body.dark-mode .social-icon-btn {
+  background-color: #374151;
+}
+
+body.dark-mode #logout-btn,
+body.dark-mode .theme-btn {
+  background-color: #374151;
+  color: var(--cor-texto-suave);
+  border-color: #4b5563;
+}
+
+body.dark-mode #logout-btn:hover {
+  background-color: var(--cor-erro);
+  color: #fff;
+  border-color: var(--cor-erro);
+}
+
+body.dark-mode .theme-btn:hover {
+  background-color: #4b5563;
+}
+
+body.dark-mode .transaction-item:hover {
+  background-color: #111827;
+}
+
+body.dark-mode .edit-btn,
+body.dark-mode .delete-btn {
+  background-color: #374151;
+  color: #e5e7eb;
+  border-color: #4b5563;
+}
+
+body.dark-mode .edit-btn:hover {
+  background-color: rgba(79, 70, 229, 0.3);
+  color: #a5b4fc;
+  border-color: rgba(79, 70, 229, 0.6);
+}
+
+body.dark-mode .delete-btn:hover {
+  background-color: rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.6);
+}
+
+body.dark-mode .category-list-item {
+  background-color: var(--cor-fundo);
+}
+
+body.dark-mode .delete-category-btn {
+  color: #e5e7eb;
+}
+
+body.dark-mode .delete-category-btn:hover {
+  color: #fca5a5;
+}
+
+body.dark-mode .view-navigation {
+  background-color: #111827;
+  border-color: #374151;
+}
+
+body.dark-mode .view-tab-btn {
+  color: #d1d5db;
+}
+
+body.dark-mode .view-tab-btn:hover {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: var(--cor-primaria-light);
+}
+
+body.dark-mode .toast {
+  background-color: #1f2937;
+}
+
+body.dark-mode .filters-container {
+  background-color: transparent;
+}
+
+body.dark-mode .budget-progress-bar {
+  background-color: #374151;
+}

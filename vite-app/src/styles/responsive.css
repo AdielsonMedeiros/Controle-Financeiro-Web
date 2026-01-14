@@ -1,0 +1,133 @@
+/* ===================================
+   Responsive Styles
+   =================================== */
+
+/* Large screens */
+@media (max-width: 1200px) {
+  .bento-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .card-form { grid-column: 1 / 2; grid-row: 1 / 2; }
+  .card-summary { grid-column: 2 / 3; grid-row: 1 / 2; }
+  .card-chart { grid-column: 1 / 2; grid-row: 2 / 3; }
+  .card-budgets { grid-column: 2 / 3; grid-row: 2 / 3; }
+  .card-transactions { grid-column: 1 / 3; grid-row: 3 / 4; }
+}
+
+/* Medium screens */
+@media (max-width: 768px) {
+  .dashboard-wrapper {
+    padding: 0 16px 24px;
+  }
+  
+  .bento-grid,
+  .categories-grid,
+  .reports-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .card-form,
+  .card-summary,
+  .card-chart,
+  .card-budgets,
+  .card-transactions {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .dashboard-title {
+    text-align: center;
+    font-size: 24px;
+  }
+  
+  .header-user-info {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .summary-container {
+    grid-template-columns: 1fr;
+  }
+
+  .view-navigation {
+    flex-direction: column;
+  }
+
+  .filter-options {
+    flex-direction: column;
+  }
+
+  #custom-date-range {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .brand-logo {
+    justify-content: center;
+  }
+}
+
+/* Small screens */
+@media (max-width: 576px) {
+  h1 {
+    font-size: 28px;
+  }
+
+  .container {
+    padding: 25px;
+    margin: 10px;
+  }
+
+  button {
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .transaction-item {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .transaction-item .actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .social-icon-btn {
+    width: 45px !important;
+    height: 45px;
+  }
+
+  .toast {
+    max-width: calc(100vw - 40px);
+  }
+
+  #toast-container {
+    left: 20px;
+    right: 20px;
+    max-width: none;
+  }
+
+  .app-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .app-banner-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+  }
+
+  .app-banner-text {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+}
