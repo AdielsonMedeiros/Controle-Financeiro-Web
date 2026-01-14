@@ -53,24 +53,41 @@ input::placeholder {
 /* ===================================
    Buttons
    =================================== */
+/* ===================================
+   Buttons (Modern Flat)
+   =================================== */
 button {
   width: 100%;
-  padding: 14px;
-  background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-primaria-hover) 100%);
+  padding: 12px 20px;
+  background-color: var(--cor-primaria);
   color: #fff;
   border: none;
   border-radius: var(--radius-md);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: all var(--transicao-media);
-  box-shadow: var(--sombra-botao);
-  position: relative;
-  overflow: hidden;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  letter-spacing: 0.3px;
+}
+
+button:hover {
+  background-color: var(--cor-primaria-hover); /* Solid color hover */
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Removing old gradients/effects */
+button::before {
+  display: none;
 }
 
 button svg,
@@ -139,16 +156,48 @@ button:active {
 /* ===================================
    Tabs
    =================================== */
+/* ===================================
+   Tabs (Modern Segmented Control)
+   =================================== */
 .tabs {
   display: flex;
   margin-bottom: 25px;
-  background-color: var(--cor-fundo);
-  border-radius: var(--radius-md);
-  padding: 6px;
-  border: 1px solid var(--cor-borda);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  gap: 8px;
+  background-color: #f1f5f9; /* Light gray pill container */
+  border-radius: 9999px; /* Pill shape */
+  padding: 4px;
+  border: none;
+  gap: 0;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
 }
+
+.tab-btn {
+  flex: 1;
+  padding: 10px 20px;
+  background: transparent;
+  color: var(--cor-texto-suave);
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 9999px; /* Pill shape buttons */
+  font-size: 14px;
+  box-shadow: none;
+}
+
+.tab-btn:hover {
+  color: var(--cor-primaria);
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.tab-btn.active {
+  background-color: #ffffff; /* White active background */
+  color: var(--cor-primaria); /* Blue active text */
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+}
+
+/* Dark mode adjustments for tabs would be handled in themes.css, 
+   but ensuring basics here */
 
 .tab-btn {
   flex: 1;
@@ -235,35 +284,44 @@ button:active {
 /* ===================================
    Edit/Delete Buttons
    =================================== */
+/* ===================================
+   Edit/Delete Buttons (Modern Minimalist)
+   =================================== */
 .edit-btn,
 .delete-btn {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--cor-fundo);
-  color: var(--cor-texto);
-  border: 1px solid var(--cor-borda);
-  border-radius: 8px;
-  transition: all var(--transicao-media);
+  background-color: transparent;
+  color: var(--cor-texto-suave);
+  border: 1px solid transparent; /* Invisible border for layout stability */
+  border-radius: var(--radius-md); /* Rounded corners */
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
+.edit-btn svg,
+.delete-btn svg {
+  stroke-width: 2px;
+  width: 18px;
+  height: 18px;
+}
+
+/* Edit Button Hover - Soft Blue */
 .edit-btn:hover {
-  background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-primaria-light) 100%);
-  color: #ffffff;
-  border-color: var(--cor-primaria);
-  transform: none;
-  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--cor-primaria);
+  transform: translateY(-1px);
 }
 
+/* Delete Button Hover - Soft Red */
 .delete-btn:hover {
-  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
-  color: #ffffff;
-  border-color: #dc2626;
-  transform: none;
-  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--cor-erro);
+  transform: translateY(-1px);
 }
 
 /* ===================================
@@ -317,42 +375,19 @@ button:active {
    Standardized Buttons & Tabs (Blue Theme)
    =================================== */
 
-/* Active Tabs - Blue Background, White Text */
-.tab-btn.active {
-  background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-primaria-hover) 100%);
-  color: #ffffff;
-  font-weight: 600;
-  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
-  border: none;
-}
+/* ===================================
+   Standardized Buttons & Tabs (Clean Blue Theme)
+   =================================== */
 
-.tab-btn:hover:not(.active) {
-  background-color: rgba(59, 130, 246, 0.1);
-  color: var(--cor-primaria);
-}
-
-/* Ensure data-tab selectors don't override the standard style if they exist elsewhere, 
-   but since I'm confusing myself, let's just make sure the specific selectors are removed 
-   or reset. The best way is to simply NOT have the specific selectors I just added. 
-   So by replacing the block, they are gone. */
-
-/* Submit Buttons - Standard Blue */
+/* Overriding specific submit buttons to ensure consistency */
 #expense-submit-btn,
 #income-submit-btn {
-  background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-primaria-hover) 100%);
-  box-shadow: var(--sombra-botao);
-  color: #ffffff;
+  background-color: var(--cor-primaria); /* Solid Blue */
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
 }
 
 #expense-submit-btn:hover,
 #income-submit-btn:hover {
-  background: linear-gradient(135deg, var(--cor-primaria-hover) 0%, var(--cor-primaria-dark) 100%);
-  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5);
-  transform: translateY(-2px);
-}
-
-/* Button generic */
-button {
-  border-radius: var(--radius-md);
-  letter-spacing: 0.3px;
+  background-color: var(--cor-primaria-dark);
+  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
 }
